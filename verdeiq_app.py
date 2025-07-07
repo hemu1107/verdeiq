@@ -1,5 +1,6 @@
+
 import streamlit as st
-import openai
+import requests
 import json
 import os
 import plotly.graph_objects as go
@@ -11,14 +12,12 @@ def load_questions():
 
 questions = load_questions()
 
-openai.api_key = st.secrets["openai_api_key"] if "openai_api_key" in st.secrets else os.getenv("OPENAI_API_KEY")
-
 pillar_scores = {"Environmental": 0, "Social": 0, "Governance": 0}
 pillar_counts = {"Environmental": 0, "Social": 0, "Governance": 0}
 
 st.set_page_config(page_title="VerdeIQ | ESG Score for Startups", layout="centered")
 st.title("🌿 VerdeIQ – ESG Readiness Score")
-st.write("Answer 15 quick questions and get your GreenScore + AI-based ESG maturity tips")
+st.write("Answer a few quick questions and get your GreenScore + AI-based ESG maturity tips")
 
 responses = {}
 st.markdown("---")
@@ -60,25 +59,23 @@ if submitted:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    prompt = f"""
-    A startup has the following ESG scores (0–5 scale):
-    Environmental: {values[0]}
-    Social: {values[1]}
-    Governance: {values[2]}
-    Provide 2 actionable, beginner-friendly improvement tips per pillar to help them improve ESG maturity.
-    """
+    prompt = f"A startup has these ESG scores (0–5 scale):\nEnvironmental: {values[0]}\nSocial: {values[1]}\nGovernance: {values[2]}\nProvide 2 beginner-friendly improvement tips per pillar to improve ESG maturity."
 
     try:
-        with st.spinner("Generating ESG recommendations..."):
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",  # ✅ Now using model available to all
-                messages=[
-                    {"role": "system", "content": "You are a helpful sustainability advisor for startups."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=400
-            )
-            recs = response["choices"][0]["message"]["content"]
+        with st.spinner("Generating ESG recommendations via Cohere..."):
+            cohere_api_key = st.secrets["cohere_api_key"]
+            cohere_url = "https://api.cohere.ai/v1/chat"
+            headers = {
+                "Authorization": f"Bearer {cohere_api_key}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "model": "command-r-plus",
+                "message": prompt
+            }
+            response = requests.post(cohere_url, headers=headers, json=data)
+            result = response.json()
+            recs = result.get("text") or result.get("response") or "No recommendation received."
             st.markdown("---")
             st.subheader("🔍 AI-Powered ESG Recommendations")
             st.markdown(recs)
@@ -86,4 +83,4 @@ if submitted:
         st.error(f"Failed to generate recommendations: {e}")
 
     st.markdown("---")
-    st.caption("Built by Hemaang Patkar using ESG Frameworks + Streamlit")
+    st.caption("Built with ❤️ by Hemaang Patkar using Cohere + ESG Frameworks + Streamlit")
