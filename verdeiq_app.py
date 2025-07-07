@@ -31,7 +31,7 @@ if "page" not in st.session_state:
 
 # --- Intro Page ---
 if st.session_state.page == "intro":
-    st.title("🌿 Welcome to VerdeIQ")
+    st.title("Welcome to VerdeIQ")
     st.subheader("Measure and Enhance Your ESG Maturity")
     st.markdown("""
     **What is VerdeIQ?**
@@ -39,9 +39,9 @@ if st.session_state.page == "intro":
     VerdeIQ is a smart ESG assessment platform for organizations—whether startups, SMEs, or enterprises. The word **Verde** means *Green* in Spanish, symbolizing our commitment to sustainability. "VerdeIQ" represents *Green Intelligence*—insightful, data-backed ESG action.
 
     **How It Works**
-    - Answer 15 curated questions across Environmental, Social, and Governance (ESG) pillars
+    - Answer these core 15 curated questions across Environmental, Social and Governance (ESG) pillars
     - Receive a **Verde Score (0–100)** based on your practices
-    - Get AI-powered recommendations using **GRI**, **SASB**, **BRSR**, and **UN SDGs** frameworks
+    - Get AI-powered recommendations using **GRI**, **SASB**, **BRSR** & other related frameworks
 
     **Verde Score Badge System**
     - 🌱 **Seedling (0–29)** – Early-stage awareness
@@ -60,7 +60,7 @@ elif st.session_state.page == "details":
     st.session_state.company_info['name'] = st.text_input("Organization Name")
     st.session_state.company_info['industry'] = st.text_input("Industry")
     st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500+"])
-    st.session_state.company_info['location'] = st.text_input("Location (City, Country)")
+    st.session_state.company_info['location'] = st.text_input("Location (City)")
     st.session_state.company_info['esg_goals'] = st.multiselect("Current ESG focus areas", ["Carbon Neutrality", "DEI (Diversity, Equity, Inclusion)", "Data Privacy", "Compliance", "Community Engagement", "Green Reporting"])
     if st.button("Start Assessment →"):
         st.session_state.page = "env"
@@ -70,7 +70,7 @@ elif st.session_state.page == "details":
 elif st.session_state.page == "env":
     st.title("🌿 Environmental Readiness")
     st.markdown("""
-    This section assesses your environmental practices: emissions, energy use, water, waste, and sustainability strategy.
+    This section assesses your environmental practices: emissions, energy use, water, waste and sustainability strategy.
     """)
     with st.form("env_form"):
         for q in env_questions:
@@ -87,7 +87,7 @@ elif st.session_state.page == "env":
 elif st.session_state.page == "soc":
     st.title("🤝 Social Impact Readiness")
     st.markdown("""
-    This section explores how you approach team well-being, diversity, equity, inclusion, training, and community involvement.
+    This section explores how you approach team well-being, diversity, equity, inclusion, training and community involvement.
     """)
     with st.form("soc_form"):
         for q in soc_questions:
@@ -104,7 +104,7 @@ elif st.session_state.page == "soc":
 elif st.session_state.page == "gov":
     st.title("🏛️ Governance Structure Readiness")
     st.markdown("""
-    Evaluate your leadership integrity, compliance practices, board structure, and information security.
+    Evaluate your leadership integrity, compliance practices, board structure and information security.
     """)
     with st.form("gov_form"):
         for q in gov_questions:
@@ -152,11 +152,11 @@ elif st.session_state.page == "results":
     labels = list(pillar_scores.keys())
     values = [pillar_scores[p] / pillar_counts[p] if pillar_counts[p] > 0 else 0 for p in labels]
     fig = go.Figure(data=go.Scatterpolar(r=values, theta=labels, fill='toself', name='ESG Maturity'))
-    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
     prompt = f"""
-    You are an expert ESG advisor helping a company with tailored advice.
+    You are an expert Senior ESG Consultant Advisor helping a company with tailored advice.
 
     Company Details:
     - Name: {info['name']}
@@ -170,7 +170,7 @@ elif st.session_state.page == "results":
     - Social: {values[1]:.2f}
     - Governance: {values[2]:.2f}
 
-    Provide personalized, beginner-friendly recommendations referencing real frameworks like GRI, SASB, SDGs, or BRSR.
+    Provide personalized, industry grade recommendations referencing real frameworks like GRI, SASB, SDGs, or BRSR.
     """
 
     try:
