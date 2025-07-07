@@ -28,10 +28,11 @@ if st.session_state.page == "intro":
     st.title("🌱 Welcome to VerdeIQ")
     st.subheader("Your ESG Readiness Companion for Startups")
     st.markdown("""
-    ESG (Environmental, Social, Governance) practices reflect your startup's values,
-    resilience, and long-term strategy. VerdeIQ helps you assess and improve these areas
-    with a personalized ESG score and AI-generated insights.
-    """)
+Environmental, Social, and Governance (ESG) practices are more than checkboxes—they reflect your company’s core values, its ability to adapt, and its commitment to long-term impact. 
+
+VerdeIQ simplifies ESG discovery by guiding you through a quick self-assessment and providing a personalized GreenScore along with actionable, AI-powered insights tailored to your startup's profile.
+""")
+
 
     st.markdown("---")
     st.subheader("📋 Tell us about your company")
