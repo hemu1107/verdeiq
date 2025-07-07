@@ -1,0 +1,257 @@
+[
+  {
+    "id": "E1",
+    "pillar": "Environmental",
+    "question": "Does your company measure its carbon emissions or environmental impact?",
+    "frameworks": [
+      "GRI 305",
+      "SASB EM0101"
+    ],
+    "options": [
+      "We do not track or measure our environmental impact.",
+      "We\u2019re aware of the impact but haven\u2019t started tracking.",
+      "We estimate emissions informally (e.g., spreadsheets).",
+      "We track specific metrics like electricity or transport use.",
+      "We use tools/software for regular emissions tracking.",
+      "We follow a certified emissions methodology (e.g., GHG Protocol)."
+    ]
+  },
+  {
+    "id": "E2",
+    "pillar": "Environmental",
+    "question": "Have you taken steps to reduce your energy use or use renewables?",
+    "frameworks": [
+      "GRI 302",
+      "SASB IF0102"
+    ],
+    "options": [
+      "No efforts to reduce energy use.",
+      "Energy reduction is discussed but not acted upon.",
+      "We promote low-energy practices informally.",
+      "We\u2019ve upgraded to energy-efficient devices or cloud setups.",
+      "Some energy is sourced from renewable providers.",
+      "Most of our energy use is renewable and optimized."
+    ]
+  },
+  {
+    "id": "E3",
+    "pillar": "Environmental",
+    "question": "Do you manage office or product waste responsibly?",
+    "frameworks": [
+      "GRI 306",
+      "SASB TC-SI"
+    ],
+    "options": [
+      "No policies or action around waste management.",
+      "Basic waste segregation or informal recycling.",
+      "Recycling or waste reduction in some departments.",
+      "Company-wide waste reduction/reuse initiatives.",
+      "Waste data is tracked and reviewed.",
+      "Zero-waste targets and third-party waste audits in place."
+    ]
+  },
+  {
+    "id": "E4",
+    "pillar": "Environmental",
+    "question": "Do you track or minimize water usage in your operations?",
+    "frameworks": [
+      "GRI 303",
+      "SASB CG-MT"
+    ],
+    "options": [
+      "Water usage isn\u2019t tracked or monitored.",
+      "We are aware but don\u2019t track or manage it.",
+      "We monitor water use occasionally or in limited areas.",
+      "Water-saving devices or behaviors are implemented.",
+      "Water usage is regularly tracked and reported internally.",
+      "We follow water management frameworks and community standards."
+    ]
+  },
+  {
+    "id": "E5",
+    "pillar": "Environmental",
+    "question": "Do you have sustainability goals or a documented environmental policy?",
+    "frameworks": [
+      "GRI 102",
+      "GRI 301"
+    ],
+    "options": [
+      "No goals or policy regarding sustainability.",
+      "Sustainability is part of our values but undocumented.",
+      "Some goals exist but not formalized.",
+      "We have a defined internal policy.",
+      "We set measurable KPIs and review progress.",
+      "We publish ESG or sustainability reports regularly."
+    ]
+  },
+  {
+    "id": "S1",
+    "pillar": "Social",
+    "question": "Do you track team diversity (gender, background, etc.)?",
+    "frameworks": [
+      "GRI 405",
+      "SASB SV-PS"
+    ],
+    "options": [
+      "No tracking or data on diversity.",
+      "Diversity is informally discussed, not tracked.",
+      "Some basic data (e.g., gender) is collected.",
+      "Diversity data tracked for hiring or reporting.",
+      "DEI data reviewed and linked to hiring/promotion.",
+      "Transparent dashboards + equity benchmarks published."
+    ]
+  },
+  {
+    "id": "S2",
+    "pillar": "Social",
+    "question": "Do you offer training on inclusion, bias, or wellness?",
+    "frameworks": [
+      "GRI 404",
+      "GRI 405"
+    ],
+    "options": [
+      "No training or awareness efforts exist.",
+      "Informal talks or HR reminders on these topics.",
+      "One-off or voluntary training is offered.",
+      "Structured sessions conducted annually.",
+      "Training tracked, evaluated, and improved.",
+      "Company-wide, mandatory, and leadership-supported training."
+    ]
+  },
+  {
+    "id": "S3",
+    "pillar": "Social",
+    "question": "Do you gather employee feedback and take action on it?",
+    "frameworks": [
+      "GRI 402",
+      "SASB SV-HR"
+    ],
+    "options": [
+      "No structured feedback mechanisms.",
+      "Verbal or informal feedback only.",
+      "Surveys are conducted but not acted on.",
+      "Feedback informs occasional team policies.",
+      "Feedback is collected, reviewed, and actioned regularly.",
+      "Continuous improvement loop with leadership ownership."
+    ]
+  },
+  {
+    "id": "S4",
+    "pillar": "Social",
+    "question": "Do you support community projects or social causes?",
+    "frameworks": [
+      "GRI 413",
+      "UN SDG 11"
+    ],
+    "options": [
+      "No community involvement or giving.",
+      "One-time donations or local support.",
+      "Team volunteering encouraged.",
+      "Formal CSR or volunteering programs exist.",
+      "Long-term partnerships with communities/NGOs.",
+      "Measurable social impact metrics reviewed yearly."
+    ]
+  },
+  {
+    "id": "S5",
+    "pillar": "Social",
+    "question": "Do you invest in upskilling or employee development?",
+    "frameworks": [
+      "GRI 404",
+      "SASB SV-HR"
+    ],
+    "options": [
+      "No training or upskilling budget.",
+      "Informal peer learning is encouraged.",
+      "Occasional workshops or event participation.",
+      "L&D budget and tracking exist per team.",
+      "Employees have learning plans or certifications.",
+      "Embedded learning culture + tracked ROI on training."
+    ]
+  },
+  {
+    "id": "G1",
+    "pillar": "Governance",
+    "question": "Do you have a code of conduct or ethics policy?",
+    "frameworks": [
+      "GRI 205",
+      "SASB CG-AM"
+    ],
+    "options": [
+      "No policy or formal statement on ethics.",
+      "Unwritten guidelines known internally.",
+      "Draft policy exists, not followed widely.",
+      "Policy shared, team agrees upon joining.",
+      "Training conducted on ethics/compliance.",
+      "Formal audits or certifications on ethical compliance."
+    ]
+  },
+  {
+    "id": "G2",
+    "pillar": "Governance",
+    "question": "Is your leadership or board diverse?",
+    "frameworks": [
+      "GRI 405",
+      "BRSR 2021"
+    ],
+    "options": [
+      "No diversity at leadership level.",
+      "Limited diversity, no active effort.",
+      "Goals for leadership diversity exist.",
+      "At least one underrepresented leader/team member.",
+      "D&I factored into senior hiring.",
+      "Board/leadership team meets diversity benchmarks."
+    ]
+  },
+  {
+    "id": "G3",
+    "pillar": "Governance",
+    "question": "How do you manage customer or employee data privacy?",
+    "frameworks": [
+      "GRI 418",
+      "SASB TC-SI"
+    ],
+    "options": [
+      "No data protection practices in place.",
+      "Passwords and local storage practices only.",
+      "Access controls and manual data handling policies.",
+      "Tools like 2FA, cloud encryption, secure storage.",
+      "Documented data privacy policy + staff awareness.",
+      "Privacy audits and compliance with GDPR/ISO/HIPAA."
+    ]
+  },
+  {
+    "id": "G4",
+    "pillar": "Governance",
+    "question": "Is executive compensation fair and transparent?",
+    "frameworks": [
+      "GRI 102-35",
+      "SASB CG-AM"
+    ],
+    "options": [
+      "No compensation structure or transparency.",
+      "Founders set pay without review.",
+      "Internal pay bands exist but not shared.",
+      "Compensation policies are team-visible.",
+      "Pay equity reviewed annually.",
+      "External benchmarking + governance board approval."
+    ]
+  },
+  {
+    "id": "G5",
+    "pillar": "Governance",
+    "question": "Do you have whistleblower or conflict of interest policies?",
+    "frameworks": [
+      "GRI 102-17",
+      "SASB CG"
+    ],
+    "options": [
+      "No process or channel exists.",
+      "Verbal assurance from founders.",
+      "Email/reporting system in place.",
+      "Policy shared with team during onboarding.",
+      "Anonymous reporting channel + documented process.",
+      "Whistleblower policy with external/legal oversight."
+    ]
+  }
+]
