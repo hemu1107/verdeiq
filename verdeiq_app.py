@@ -31,7 +31,7 @@ if "page" not in st.session_state:
 
 # --- Intro Page ---
 if st.session_state.page == "intro":
-    st.title("Welcome to VerdeIQ")
+    st.title("Welcome to VerdeIQ!")
     st.subheader("Measure and Enhance Your ESG Maturity")
     st.markdown("""
     **What is VerdeIQ?**
