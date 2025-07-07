@@ -36,7 +36,7 @@ if st.session_state.page == "intro":
     st.markdown("""
     **What is VerdeIQ?**
 
-    - *VerdeIQ* is a smart ESG assessment platform for organizations whether startups, SMEs, or enterprises. 
+    - *VerdeIQ* is an AI-powered ESG Assessment Tool for organizations whether startups, SMEs, or enterprises. 
     - The word **Verde** means *Green* in Spanish, symbolizing our commitment to sustainability. 
     - *VerdeIQ* represents *Green Intelligence*—insightful, data-backed ESG action.
 
