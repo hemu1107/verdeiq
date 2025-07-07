@@ -31,20 +31,20 @@ if "page" not in st.session_state:
 
 # --- Intro Page ---
 if st.session_state.page == "intro":
-    st.title("🌍 Welcome to VerdeIQ")
+    st.title("Welcome to VerdeIQ")
     st.subheader("Make Your Startup ESG-Ready")
     st.markdown("""
     VerdeIQ is your sustainability companion. ESG—Environmental, Social, and Governance—are global standards that help assess an organization's ethics, impact, and resilience.
 
-    ✅ Built on GRI, SASB, BRSR & UN SDGs frameworks
-    ✅ Personalized AI recommendations
-    ✅ Visual ESG Maturity Radar
-    
+    Built on GRI, SASB, BRSR & UN SDGs frameworks
+    Personalized AI recommendations
+    Visual ESG Maturity Radar
+
     We’ll ask you a few simple questions and tailor your journey.
     """)
 
     st.markdown("---")
-    st.subheader("🏢 Company Details")
+    st.subheader("Company Details")
     st.session_state.company_info['name'] = st.text_input("Company Name")
     st.session_state.company_info['industry'] = st.text_input("Industry")
     st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500+"])
@@ -57,11 +57,12 @@ if st.session_state.page == "intro":
 
 # --- Environmental Page ---
 elif st.session_state.page == "env":
-    st.title("🌿 Environmental Readiness")
+    st.title("Environmental Readiness")
     with st.form("env_form"):
         for q in env_questions:
             st.markdown(f"**{q['id']}: {q['question']}**")
-            st.caption("Frameworks: GRI, SASB")
+            frameworks = ', '.join(q.get('frameworks', []))
+            st.caption(f"Frameworks: {frameworks}" if frameworks else "")
             st.session_state.responses[q['id']] = st.radio("", q['options'], index=0, key=q['id'])
         if st.form_submit_button("Next: Social →"):
             st.session_state.page = "soc"
@@ -69,11 +70,12 @@ elif st.session_state.page == "env":
 
 # --- Social Page ---
 elif st.session_state.page == "soc":
-    st.title("🤝 Social Impact Readiness")
+    st.title("Social Impact Readiness")
     with st.form("soc_form"):
         for q in soc_questions:
             st.markdown(f"**{q['id']}: {q['question']}**")
-            st.caption("Frameworks: GRI, UN SDGs")
+            frameworks = ', '.join(q.get('frameworks', []))
+            st.caption(f"Frameworks: {frameworks}" if frameworks else "")
             st.session_state.responses[q['id']] = st.radio("", q['options'], index=0, key=q['id'])
         if st.form_submit_button("Next: Governance →"):
             st.session_state.page = "gov"
@@ -81,11 +83,12 @@ elif st.session_state.page == "soc":
 
 # --- Governance Page ---
 elif st.session_state.page == "gov":
-    st.title("🏛️ Governance Structure Readiness")
+    st.title("Governance Structure Readiness")
     with st.form("gov_form"):
         for q in gov_questions:
             st.markdown(f"**{q['id']}: {q['question']}**")
-            st.caption("Frameworks: GRI, BRSR")
+            frameworks = ', '.join(q.get('frameworks', []))
+            st.caption(f"Frameworks: {frameworks}" if frameworks else "")
             st.session_state.responses[q['id']] = st.radio("", q['options'], index=0, key=q['id'])
         if st.form_submit_button("Get Final ESG Report →"):
             st.session_state.page = "results"
@@ -107,17 +110,15 @@ elif st.session_state.page == "results":
         pillar_counts[q["pillar"]] += 1
 
     greenscore = round((total_score / (5 * len(questions))) * 100)
-    st.title("✅ Your ESG Summary Report")
-    st.success(f"🌿 GreenScore: **{greenscore}/100**")
+    st.title("Your ESG Summary Report")
+    st.success(f"GreenScore: **{greenscore}/100**")
 
-    # Radar Chart
     labels = list(pillar_scores.keys())
     values = [pillar_scores[p] / pillar_counts[p] if pillar_counts[p] > 0 else 0 for p in labels]
     fig = go.Figure(data=go.Scatterpolar(r=values, theta=labels, fill='toself', name='ESG Maturity'))
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # AI Prompt
     prompt = f"""
     You are an expert ESG advisor helping a startup with tailored advice.
 
@@ -152,12 +153,12 @@ elif st.session_state.page == "results":
             result = response.json()
             recs = result.get("text") or result.get("response") or "No recommendations received."
             st.markdown("---")
-            st.subheader("📚 ESG Framework-Based Recommendations")
+            st.subheader("ESG Framework-Based Recommendations")
             st.markdown(recs)
     except Exception as e:
         st.error(f"Failed to generate recommendations: {e}")
 
-    st.download_button("📥 Download My ESG Report", data=json.dumps({
+    st.download_button("Download My ESG Report", data=json.dumps({
         "company": info,
         "score": greenscore,
         "pillar_scores": dict(zip(labels, values)),
