@@ -154,7 +154,7 @@ elif st.session_state.page == "results":
     labels = list(pillar_scores.keys())
     values = [pillar_scores[p] / pillar_counts[p] if pillar_counts[p] > 0 else 0 for p in labels]
     fig = go.Figure(data=go.Scatterpolar(r=values, theta=labels, fill='toself', name='ESG Maturity'))
-    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False)
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
     prompt = f"""
