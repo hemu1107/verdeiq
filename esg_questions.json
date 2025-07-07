@@ -3,13 +3,10 @@
     "id": "E1",
     "pillar": "Environmental",
     "question": "Does your company measure its carbon emissions or environmental impact?",
-    "frameworks": [
-      "GRI 305",
-      "SASB EM0101"
-    ],
+    "frameworks": ["GRI 305", "SASB EM0101"],
     "options": [
       "We do not track or measure our environmental impact.",
-      "We\u2019re aware of the impact but haven\u2019t started tracking.",
+      "We’re aware of the impact but haven’t started tracking.",
       "We estimate emissions informally (e.g., spreadsheets).",
       "We track specific metrics like electricity or transport use.",
       "We use tools/software for regular emissions tracking.",
@@ -20,15 +17,12 @@
     "id": "E2",
     "pillar": "Environmental",
     "question": "Have you taken steps to reduce your energy use or use renewables?",
-    "frameworks": [
-      "GRI 302",
-      "SASB IF0102"
-    ],
+    "frameworks": ["GRI 302", "SASB IF0102"],
     "options": [
       "No efforts to reduce energy use.",
       "Energy reduction is discussed but not acted upon.",
       "We promote low-energy practices informally.",
-      "We\u2019ve upgraded to energy-efficient devices or cloud setups.",
+      "We’ve upgraded to energy-efficient devices or cloud setups.",
       "Some energy is sourced from renewable providers.",
       "Most of our energy use is renewable and optimized."
     ]
@@ -37,10 +31,7 @@
     "id": "E3",
     "pillar": "Environmental",
     "question": "Do you manage office or product waste responsibly?",
-    "frameworks": [
-      "GRI 306",
-      "SASB TC-SI"
-    ],
+    "frameworks": ["GRI 306", "SASB TC-SI"],
     "options": [
       "No policies or action around waste management.",
       "Basic waste segregation or informal recycling.",
@@ -54,13 +45,10 @@
     "id": "E4",
     "pillar": "Environmental",
     "question": "Do you track or minimize water usage in your operations?",
-    "frameworks": [
-      "GRI 303",
-      "SASB CG-MT"
-    ],
+    "frameworks": ["GRI 303", "SASB CG-MT"],
     "options": [
-      "Water usage isn\u2019t tracked or monitored.",
-      "We are aware but don\u2019t track or manage it.",
+      "Water usage isn’t tracked or monitored.",
+      "We are aware but don’t track or manage it.",
       "We monitor water use occasionally or in limited areas.",
       "Water-saving devices or behaviors are implemented.",
       "Water usage is regularly tracked and reported internally.",
@@ -71,10 +59,7 @@
     "id": "E5",
     "pillar": "Environmental",
     "question": "Do you have sustainability goals or a documented environmental policy?",
-    "frameworks": [
-      "GRI 102",
-      "GRI 301"
-    ],
+    "frameworks": ["GRI 102", "GRI 301"],
     "options": [
       "No goals or policy regarding sustainability.",
       "Sustainability is part of our values but undocumented.",
@@ -88,10 +73,7 @@
     "id": "S1",
     "pillar": "Social",
     "question": "Do you track team diversity (gender, background, etc.)?",
-    "frameworks": [
-      "GRI 405",
-      "SASB SV-PS"
-    ],
+    "frameworks": ["GRI 405", "SASB SV-PS"],
     "options": [
       "No tracking or data on diversity.",
       "Diversity is informally discussed, not tracked.",
@@ -105,10 +87,7 @@
     "id": "S2",
     "pillar": "Social",
     "question": "Do you offer training on inclusion, bias, or wellness?",
-    "frameworks": [
-      "GRI 404",
-      "GRI 405"
-    ],
+    "frameworks": ["GRI 404", "GRI 405"],
     "options": [
       "No training or awareness efforts exist.",
       "Informal talks or HR reminders on these topics.",
@@ -122,10 +101,7 @@
     "id": "S3",
     "pillar": "Social",
     "question": "Do you gather employee feedback and take action on it?",
-    "frameworks": [
-      "GRI 402",
-      "SASB SV-HR"
-    ],
+    "frameworks": ["GRI 402", "SASB SV-HR"],
     "options": [
       "No structured feedback mechanisms.",
       "Verbal or informal feedback only.",
@@ -139,10 +115,7 @@
     "id": "S4",
     "pillar": "Social",
     "question": "Do you support community projects or social causes?",
-    "frameworks": [
-      "GRI 413",
-      "UN SDG 11"
-    ],
+    "frameworks": ["GRI 413", "UN SDG 11"],
     "options": [
       "No community involvement or giving.",
       "One-time donations or local support.",
@@ -156,10 +129,7 @@
     "id": "S5",
     "pillar": "Social",
     "question": "Do you invest in upskilling or employee development?",
-    "frameworks": [
-      "GRI 404",
-      "SASB SV-HR"
-    ],
+    "frameworks": ["GRI 404", "SASB SV-HR"],
     "options": [
       "No training or upskilling budget.",
       "Informal peer learning is encouraged.",
@@ -173,10 +143,7 @@
     "id": "G1",
     "pillar": "Governance",
     "question": "Do you have a code of conduct or ethics policy?",
-    "frameworks": [
-      "GRI 205",
-      "SASB CG-AM"
-    ],
+    "frameworks": ["GRI 205", "SASB CG-AM"],
     "options": [
       "No policy or formal statement on ethics.",
       "Unwritten guidelines known internally.",
@@ -190,10 +157,7 @@
     "id": "G2",
     "pillar": "Governance",
     "question": "Is your leadership or board diverse?",
-    "frameworks": [
-      "GRI 405",
-      "BRSR 2021"
-    ],
+    "frameworks": ["GRI 405", "BRSR 2021"],
     "options": [
       "No diversity at leadership level.",
       "Limited diversity, no active effort.",
@@ -207,10 +171,7 @@
     "id": "G3",
     "pillar": "Governance",
     "question": "How do you manage customer or employee data privacy?",
-    "frameworks": [
-      "GRI 418",
-      "SASB TC-SI"
-    ],
+    "frameworks": ["GRI 418", "SASB TC-SI"],
     "options": [
       "No data protection practices in place.",
       "Passwords and local storage practices only.",
@@ -224,10 +185,7 @@
     "id": "G4",
     "pillar": "Governance",
     "question": "Is executive compensation fair and transparent?",
-    "frameworks": [
-      "GRI 102-35",
-      "SASB CG-AM"
-    ],
+    "frameworks": ["GRI 102-35", "SASB CG-AM"],
     "options": [
       "No compensation structure or transparency.",
       "Founders set pay without review.",
@@ -241,10 +199,7 @@
     "id": "G5",
     "pillar": "Governance",
     "question": "Do you have whistleblower or conflict of interest policies?",
-    "frameworks": [
-      "GRI 102-17",
-      "SASB CG"
-    ],
+    "frameworks": ["GRI 102-17", "SASB CG"],
     "options": [
       "No process or channel exists.",
       "Verbal assurance from founders.",
