@@ -71,7 +71,7 @@ if submitted:
     try:
         with st.spinner("Generating ESG recommendations..."):
             response = openai.ChatCompletion.create(
-                model="gpt-4",
+                model="gpt-3.5-turbo",  # ✅ Now using model available to all
                 messages=[
                     {"role": "system", "content": "You are a helpful sustainability advisor for startups."},
                     {"role": "user", "content": prompt}
@@ -86,4 +86,4 @@ if submitted:
         st.error(f"Failed to generate recommendations: {e}")
 
     st.markdown("---")
-    st.caption("Built with ❤️ by Hemaang Patkar using OpenAI + ESG Frameworks + Streamlit")
+    st.caption("Built by Hemaang Patkar using ESG Frameworks + Streamlit")
