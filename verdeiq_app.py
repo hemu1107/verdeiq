@@ -168,71 +168,68 @@ elif st.session_state.page == "results":
         responses = st.session_state.responses
         detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
         prompt = f"""
-You are a world-renowned ESG consulting partner with over 25 years of experience advising Fortune 500 companies, SMEs, and startups globally. Your role now is to prepare a highly customized, professional-grade ESG Assessment Report and Strategic Roadmap for the client below. This report should resemble the output of a high-cost consultancy engagement and must serve executive-level leadership, regulatory teams, and CSR officers alike.
+You are a global ESG Strategy Partner with 25+ years of experience advising Fortune 500s, SMEs, and startups on ESG transformation. Your task is to generate a high-impact, AI-informed **ESG Assessment Report & Strategic Roadmap** tailored for this client, using leading frameworks such as GRI, SASB, TCFD, SDG 13, and India's BRSR. Your output should reflect the quality of a $25,000+ consulting engagement.
 
-### Organization Snapshot:
+### 🏢 Company Profile:
 - **Company Name**: {info.get('name')}
-- **Industry Sector**: {info.get('industry')}
-- **Headcount / Team Size**: {info.get('size')}
-- **Public or Private**: {info.get('public_status')}
-- **Region of Operation**: {info.get('region')}
-- **Years Operating**: {info.get('years_operating')} years
-- **Top ESG Focus Areas**: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
+- **Industry**: {info.get('industry')}
+- **Size**: {info.get('size')}
+- **Ownership Type**: {info.get('public_status')}
+- **Location**: {info.get('region')}
+- **Years in Operation**: {info.get('years_operating')} years
+- **Key ESG Focus Areas**: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
-### Assessment Summary via VerdeIQ Model:
-- 🌱 **Verde Score**: {verde_score}/100
-- 📘 Environmental Maturity: {values[0]:.2f} / 5
-- 🧬 Social Maturity: {values[1]:.2f} / 5
-- 🏛 Governance Maturity: {values[2]:.2f} / 5
+### 📊 VerdeIQ ESG Assessment Snapshot:
+- **Verde Score**: {verde_score}/100
+- **Environmental Maturity**: {values[0]:.2f}/5
+- **Social Maturity**: {values[1]:.2f}/5
+- **Governance Maturity**: {values[2]:.2f}/5
 
-### Detailed Assessment Inputs:
+### 🧐 AI-Driven Diagnostic Inputs:
 {detailed_answers}
 
 ---
 
-As a result, generate a fully structured advisory document which includes:
+## 📟 Report Structure (Markdown Format):
 
-#### I. Executive Summary:
-- A high-level ESG diagnosis summary
-- Top 3 risks and opportunities per pillar
+### I. Executive Summary:
+- ESG readiness snapshot and materiality overview
+- Top 3 risks and opportunities under E, S, and G
 
-#### II. ESG Maturity Analysis:
-- Where this company stands today in its ESG journey
-- Breakdown per ESG pillar including example red flags or green lights
-- Level of preparedness for assurance and audits
+### II. ESG Pillar Maturity Analysis:
+- **Environmental**: Key gaps (e.g., emissions data, energy mix, water use), positives (e.g., compliance, renewables), and audit readiness
+- **Social**: Diversity, human rights, employee well-being, community engagement
+- **Governance**: Ethics, board composition, whistleblower protection, risk controls
 
-#### III. Strategic Roadmap:
-- Specific strategic interventions per pillar
-- Prioritized Quick Wins (0–6 months)
-- Medium-Term (6–18 months) & Long-Term (18–36+ months)
-- Estimated budget or cost levels for implementation stages
+### III. Strategic ESG Roadmap:
+- 0–6 Month Quick Wins (e.g., carbon baseline, ESG policy drafting)
+- 6–18 Month Medium-Term (e.g., supplier audits, DEI rollout)
+- 18–36 Month Long-Term (e.g., ESG-linked financing, integrated reports)
+- Indicative budget tiers (Low <$10K, Mid $10–50K, High $50K+)
 
-#### IV. Framework Recommendations:
-- Which standards they should benchmark against (e.g., GRI 305, SASB, SDG 13)
-- ESG ratings readiness (e.g., CDP, BRSR, MSCI ESG Ratings, ISS)
-- Tailored reporting structures
+### IV. Benchmark Framework Alignment:
+- Recommend specific standards: GRI 302/305, SASB (Industry Specific), TCFD (climate), SDGs 5/8/13, and BRSR (India)
+- ESG rating readiness: MSCI ESG, CDP, ISS, Sustainalytics
 
-#### V. Case Studies and Tools:
-- Real-world industry case studies or initiatives aligned with each pillar
-- Toolkits, templates or vendors (software, audit, policy platforms)
-- ESG data tools or emission calculators suitable to their size and region
+### V. Tools & Case Studies:
+- Industry examples from similar-sized/global peers
+- Recommended tools: GHG Protocol Calculator, CSRBox, EcoVadis, Datamaran
+- Templates: ESG Policy, Supplier Code of Conduct, Materiality Matrix
 
-#### VI. Anticipated Roadblocks:
-- Change management, culture, resource constraints
-- Legal, compliance or reputational risks
-- Technology or data-related maturity gaps
+### VI. Key Challenges & Mitigation:
+- Cultural/organizational inertia
+- Regulatory complexity (especially in India or EU)
+- Technology & data limitations (manual tracking, missing emissions scope)
 
-#### VII. Timeline & Milestones:
-- Structured phase-wise plan
-- Key checkpoints, reviews, and reporting cadence
-- KPI suggestions and impact metrics
+### VII. Timeline & KPI Milestones:
+- Phase-wise roadmap with 3 checkpoints/year
+- Sample KPIs: Scope 1/2 emissions per revenue, % women in leadership, ESG incidents per quarter
 
-#### VIII. Conclusion & Next Steps:
-- What the company should focus on next quarter
-- Advisory-level closing note
+### VIII. Strategic Next Steps:
+- Q1 Actions: Baseline ESG KPIs, Draft ESG vision & governance charter
+- Boardroom Call-to-Action: Invest in ESG capacity and digital tools
 
-Format the response using markdown-style headings and lists.
-Ensure this feels like a \$25,000+ ESG consultant output that could be presented in a boardroom.
+Ensure this report is sharp, professional, insight-rich, and suitable for CXOs, ESG officers, regulatory liaisons, and investors alike. Use markdown headings and formatting.
 """
         with st.spinner("Generating premium-grade ESG recommendations..."):
             cohere_api_key = st.secrets.get("cohere_api_key")
