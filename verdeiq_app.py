@@ -72,7 +72,7 @@ def calculate_scores(responses):
 
 # --- Pages ---
 if st.session_state.page == "intro":
-    st.markdown("<div class='title-style'>Welcome to VerdeIQ !</div>", unsafe_allow_html=True)
+    st.markdown("<div class='title-style'>Welcome to VerdeIQ 🌿</div>", unsafe_allow_html=True)
     st.subheader("ESG Intelligence Simplified")
     st.markdown("""
     VerdeIQ is your AI-powered ESG self-assessment platform.
@@ -168,32 +168,72 @@ elif st.session_state.page == "results":
         responses = st.session_state.responses
         detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
         prompt = f"""
-You are a highly experienced ESG consultant with over 25 years advising global organizations. Create a deeply personalized roadmap for this company using industry frameworks and data maturity analysis.
+You are a world-renowned ESG consulting partner with over 25 years of experience advising Fortune 500 companies, SMEs, and startups globally. Your role now is to prepare a highly customized, professional-grade ESG Assessment Report and Strategic Roadmap for the client below. This report should resemble the output of a high-cost consultancy engagement and must serve executive-level leadership, regulatory teams, and CSR officers alike.
 
-Company Info:
-- Name: {info.get('name')}
-- Industry: {info.get('industry')}
-- Team Size: {info.get('size')}
-- Publicly Listed: {info.get('public_status')}
-- Region: {info.get('region')}
-- Years Operating: {info.get('years_operating')}
-- ESG Priorities: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
+### Organization Snapshot:
+- **Company Name**: {info.get('name')}
+- **Industry Sector**: {info.get('industry')}
+- **Headcount / Team Size**: {info.get('size')}
+- **Public or Private**: {info.get('public_status')}
+- **Region of Operation**: {info.get('region')}
+- **Years Operating**: {info.get('years_operating')} years
+- **Top ESG Focus Areas**: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
-VerdeIQ Assessment Summary:
-- Verde Score: {verde_score}/100
-- Environmental Score: {values[0]:.2f} / 5
-- Social Score: {values[1]:.2f} / 5
-- Governance Score: {values[2]:.2f} / 5
+### Assessment Summary via VerdeIQ Model:
+- 🌱 **Verde Score**: {verde_score}/100
+- 📘 Environmental Maturity: {values[0]:.2f} / 5
+- 🧬 Social Maturity: {values[1]:.2f} / 5
+- 🏛 Governance Maturity: {values[2]:.2f} / 5
 
-Detailed Responses:
+### Detailed Assessment Inputs:
 {detailed_answers}
 
-Using frameworks like GRI, SASB, SDGs, and BRSR, provide:
-1. Strategic recommendations per pillar (Environmental, Social, Governance)
-2. Quick wins and long-term initiatives
-3. Framework-aligned benchmarks to improve
-4. Real-world case study comparisons (if applicable)
-        """
+---
+
+As a result, generate a fully structured advisory document which includes:
+
+#### I. Executive Summary:
+- A high-level ESG diagnosis summary
+- Top 3 risks and opportunities per pillar
+
+#### II. ESG Maturity Analysis:
+- Where this company stands today in its ESG journey
+- Breakdown per ESG pillar including example red flags or green lights
+- Level of preparedness for assurance and audits
+
+#### III. Strategic Roadmap:
+- Specific strategic interventions per pillar
+- Prioritized Quick Wins (0–6 months)
+- Medium-Term (6–18 months) & Long-Term (18–36+ months)
+- Estimated budget or cost levels for implementation stages
+
+#### IV. Framework Recommendations:
+- Which standards they should benchmark against (e.g., GRI 305, SASB, SDG 13)
+- ESG ratings readiness (e.g., CDP, BRSR, MSCI ESG Ratings, ISS)
+- Tailored reporting structures
+
+#### V. Case Studies and Tools:
+- Real-world industry case studies or initiatives aligned with each pillar
+- Toolkits, templates or vendors (software, audit, policy platforms)
+- ESG data tools or emission calculators suitable to their size and region
+
+#### VI. Anticipated Roadblocks:
+- Change management, culture, resource constraints
+- Legal, compliance or reputational risks
+- Technology or data-related maturity gaps
+
+#### VII. Timeline & Milestones:
+- Structured phase-wise plan
+- Key checkpoints, reviews, and reporting cadence
+- KPI suggestions and impact metrics
+
+#### VIII. Conclusion & Next Steps:
+- What the company should focus on next quarter
+- Advisory-level closing note
+
+Format the response using markdown-style headings and lists.
+Ensure this feels like a \$25,000+ ESG consultant output that could be presented in a boardroom.
+"""
         with st.spinner("Generating premium-grade ESG recommendations..."):
             cohere_api_key = st.secrets.get("cohere_api_key")
             if cohere_api_key:
