@@ -99,12 +99,14 @@ elif st.session_state.page == "details":
         with c1:
             st.session_state.company_info['name'] = st.text_input("Company Name")
             st.session_state.company_info['industry'] = st.text_input("Industry")
-        with c2:
             st.session_state.company_info['location'] = st.text_input("City")
+        with c2:
             st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500+"])
-
-        st.session_state.company_info['esg_goals'] = st.multiselect("Key ESG Priorities", [
-            "Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
+            st.session_state.company_info['esg_goals'] = st.multiselect("Key ESG Priorities", [
+                "Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
+            st.session_state.company_info['public_status'] = st.radio("Is your company publicly listed?", ["Yes", "No", "Planning to"])
+        st.session_state.company_info['region'] = st.selectbox("Primary Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
+        st.session_state.company_info['years_operating'] = st.slider("Years in Operation", 0, 100, 5)
 
         if st.form_submit_button("Proceed to Assessment ➔"):
             st.session_state.page = "env"
@@ -160,27 +162,39 @@ elif st.session_state.page == "results":
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Cohere API-based Recommendations ---
+    # --- Deep ESG Consulting Prompt ---
     try:
         info = st.session_state.company_info
+        responses = st.session_state.responses
+        detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
         prompt = f"""
-        You are a Senior ESG Consultant. Based on this company's profile and ESG scores, provide a customized roadmap with actionable steps.
+You are a highly experienced ESG consultant with over 25 years advising global organizations. Create a deeply personalized roadmap for this company using industry frameworks and data maturity analysis.
 
-        Company:
-        - Name: {info.get('name')}
-        - Industry: {info.get('industry')}
-        - Size: {info.get('size')}
-        - Location: {info.get('location')}
-        - ESG Priorities: {', '.join(info.get('esg_goals', [])) or 'None'}
+Company Info:
+- Name: {info.get('name')}
+- Industry: {info.get('industry')}
+- Team Size: {info.get('size')}
+- Publicly Listed: {info.get('public_status')}
+- Region: {info.get('region')}
+- Years Operating: {info.get('years_operating')}
+- ESG Priorities: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
-        ESG Scores:
-        - Environmental: {values[0]:.2f}
-        - Social: {values[1]:.2f}
-        - Governance: {values[2]:.2f}
+VerdeIQ Assessment Summary:
+- Verde Score: {verde_score}/100
+- Environmental Score: {values[0]:.2f} / 5
+- Social Score: {values[1]:.2f} / 5
+- Governance Score: {values[2]:.2f} / 5
 
-        Recommend actions using frameworks like GRI, SASB, BRSR, SDGs.
+Detailed Responses:
+{detailed_answers}
+
+Using frameworks like GRI, SASB, SDGs, and BRSR, provide:
+1. Strategic recommendations per pillar (Environmental, Social, Governance)
+2. Quick wins and long-term initiatives
+3. Framework-aligned benchmarks to improve
+4. Real-world case study comparisons (if applicable)
         """
-        with st.spinner("Generating ESG recommendations..."):
+        with st.spinner("Generating premium-grade ESG recommendations..."):
             cohere_api_key = st.secrets.get("cohere_api_key")
             if cohere_api_key:
                 response = requests.post(
@@ -193,7 +207,7 @@ elif st.session_state.page == "results":
                 )
                 output = response.json()
                 recs = output.get("text") or output.get("response") or "No response received."
-                st.subheader("📓 ESG Recommendations")
+                st.subheader("📓 Premium ESG Recommendations")
                 st.markdown(recs)
             else:
                 st.warning("Cohere API key not found in secrets. Add `cohere_api_key` to `.streamlit/secrets.toml`.")
