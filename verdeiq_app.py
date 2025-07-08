@@ -180,10 +180,10 @@ You are an expert Senior ESG Consultant with 25+ years of experience advising co
 - ESG Focus Areas: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
 📊 **VerdeIQ Assessment Summary**
-- Verde Score: {verde_score}/100
-- Environmental Maturity: {values[0]:.2f}/5
-- Social Maturity: {values[1]:.2f}/5
-- Governance Maturity: {values[2]:.2f}/5
+- *Verde Score*: {verde_score}/100
+- *Environmental Maturity: {values[0]:.2f}/5
+- *Social Maturity*: {values[1]:.2f}/5
+- *Governance Maturity*: {values[2]:.2f}/5
 
 🧠 **Assessment Responses**
 {detailed_answers}
@@ -194,7 +194,7 @@ You are an expert Senior ESG Consultant with 25+ years of experience advising co
 
 ### 1. ESG Summary and Risk Profile
 - High-level materiality scan and score-based diagnosis
-- Risks & opportunities (%) across each pillar, benchmarked against industry best practices
+- Risks & opportunities (%) across each pillar, benchmarked against industry best practices & ESG Frameworks like GRI, SASB (industry-specific), BRSR, TCFD
 
 ### 2. Strategic ESG Roadmap
 - Quick Wins (0–6 months): cost-effective initiatives (<$10K)
@@ -204,7 +204,7 @@ You are an expert Senior ESG Consultant with 25+ years of experience advising co
 
 ### 3. Pillar-Wise Maturity Evaluation
 - For each pillar: key gaps, strengths, and next-level actions
-- Include applicable frameworks like GRI 302/305, SASB (industry-specific), BRSR, TCFD, and SDG goals (e.g., SDG 13 for climate)
+- Include applicable frameworks like GRI, SASB (industry-specific), BRSR, TCFD, and SDG goals (e.g., SDG 13 for climate)
 
 ### 4. Toolkits, Templates, and Digital Aids
 - Suggest ESG software, carbon calculators, or dashboards by company size
