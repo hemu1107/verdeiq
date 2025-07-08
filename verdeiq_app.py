@@ -160,6 +160,46 @@ elif st.session_state.page == "results":
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
+    # --- Cohere API-based Recommendations ---
+    try:
+        info = st.session_state.company_info
+        prompt = f"""
+        You are a Senior ESG Consultant. Based on this company's profile and ESG scores, provide a customized roadmap with actionable steps.
+
+        Company:
+        - Name: {info.get('name')}
+        - Industry: {info.get('industry')}
+        - Size: {info.get('size')}
+        - Location: {info.get('location')}
+        - ESG Priorities: {', '.join(info.get('esg_goals', [])) or 'None'}
+
+        ESG Scores:
+        - Environmental: {values[0]:.2f}
+        - Social: {values[1]:.2f}
+        - Governance: {values[2]:.2f}
+
+        Recommend actions using frameworks like GRI, SASB, BRSR, SDGs.
+        """
+        with st.spinner("Generating ESG recommendations..."):
+            cohere_api_key = st.secrets.get("cohere_api_key")
+            if cohere_api_key:
+                response = requests.post(
+                    url="https://api.cohere.ai/v1/chat",
+                    headers={
+                        "Authorization": f"Bearer {cohere_api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={"model": "command-r-plus", "message": prompt}
+                )
+                output = response.json()
+                recs = output.get("text") or output.get("response") or "No response received."
+                st.subheader("📓 ESG Recommendations")
+                st.markdown(recs)
+            else:
+                st.warning("Cohere API key not found in secrets. Add `cohere_api_key` to `.streamlit/secrets.toml`.")
+    except Exception as e:
+        st.error(f"Error while generating recommendations: {e}")
+
     st.download_button("Download ESG Report", data=json.dumps({
         "Company": st.session_state.company_info,
         "Score": verde_score,
