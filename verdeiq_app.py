@@ -8,6 +8,11 @@ from pathlib import Path
 # --- Configuration ---
 st.set_page_config(page_title="VerdeIQ | ESG Intelligence", layout="centered", page_icon="🌿")
 
+from PIL import Image
+logo = Image.open("verdeiq_logo.png.png")
+st.image(logo, width=160)
+
+
 # --- Styling & Theming ---
 st.markdown("""
     <style>
