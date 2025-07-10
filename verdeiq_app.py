@@ -168,12 +168,12 @@ elif st.session_state.page == "results":
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Deep ESG Consulting Prompt ---
-    try:
-        info = st.session_state.company_info
-        responses = st.session_state.responses
-        detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
-        prompt = f"""
+# --- Deep ESG Consulting Prompt ---
+try:
+    info = st.session_state.company_info
+    responses = st.session_state.responses
+    detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
+    prompt = f"""
 You are an experienced ESG Consultant tasked with drafting a precise, framework-aligned ESG Summary and Roadmap for the following company based on their self-assessment inputs.
 
 The report must reflect:
@@ -235,8 +235,6 @@ Short advisory note: What should they do in the next 90 days to advance ESG matu
 Use structured markdown format and avoid vague phrases like "you should consider..." — instead, use confident, actionable sentences. Avoid artificial metrics unless implied by the company’s responses.
 """
 
-
-    
     with st.spinner("""
 🔍 Generating your ESG Intelligence Report...
 
@@ -266,6 +264,7 @@ This may take up to **a minute**. Thanks for your patience while we create a rep
             st.markdown(recs)
         else:
             st.warning("⚠️ Cohere API key not found in secrets. Please add `cohere_api_key` to your `.streamlit/secrets.toml` file.")
+
 except Exception as e:
     st.error(f"❌ An error occurred while generating recommendations: {e}")
 
