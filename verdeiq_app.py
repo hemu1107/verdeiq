@@ -234,7 +234,7 @@ You are an expert Senior ESG Consultant with 25+ years of experience advising co
 Make sure your language is confident, analytical, and reflective of a premium ESG consulting tone. Include bullet points, ratios, dollar cost brackets, and action verbs.
 """
 
-        with st.spinner("Generating premium-grade ESG recommendations..."):
+        with st.spinner("Generating ESG recommendations - aspects would include Current Analysis, Roadmap, Toolkits, Key KPIs & Milestones, Implementation Risks, Strategic CTAs & much more, Buffer time would be at max about a minute, Thanks for your patience!"):
             cohere_api_key = st.secrets.get("cohere_api_key")
             if cohere_api_key:
                 response = requests.post(
