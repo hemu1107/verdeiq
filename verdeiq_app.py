@@ -81,7 +81,7 @@ if st.session_state.page == "intro":
     VerdeIQ is your AI-powered ESG self-assessment platform.
 
     - 💡 Answer 15 core ESG questions
-    - 📊 Get scored 0-100 + detailed insights
+    - 📊 Get scored within 0-100 to understand current ESG Maturity Standing
     - 🌍 Frameworks aligned include **GRI**, **SASB**, **BRSR**, and **UN SDGs**
     - ⚡ Get Instant Reccomendations & Detailed Roadmap within mins!
 
