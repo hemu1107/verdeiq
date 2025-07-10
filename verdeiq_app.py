@@ -236,7 +236,7 @@ Use structured markdown format and avoid vague phrases like "you should consider
 """
 
 
-    try:
+    
     with st.spinner("""
 🔍 Generating your ESG Intelligence Report...
 
