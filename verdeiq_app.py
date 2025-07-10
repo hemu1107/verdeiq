@@ -8,8 +8,6 @@ from pathlib import Path
 # --- Configuration ---
 st.set_page_config(page_title="VerdeIQ | ESG Intelligence", layout="centered", page_icon="🌿")
 
-
-
 # --- Styling & Theming ---
 st.markdown("""
     <style>
@@ -76,9 +74,7 @@ def calculate_scores(responses):
 if st.session_state.page == "intro":
     st.markdown("<div class='title-style'>Welcome to VerdeIQ !</div>", unsafe_allow_html=True)
     st.subheader("ESG Intelligence Simplified")
-
     st.caption("Crafted by Hemaang Patkar")
-    
     st.markdown("""
     VerdeIQ is your AI-powered ESG self-assessment platform.
 
@@ -168,13 +164,13 @@ elif st.session_state.page == "results":
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-# --- Deep ESG Consulting Prompt ---
-try:
-    info = st.session_state.company_info
-    responses = st.session_state.responses
-    detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
-    prompt = f"""
-You are an experienced ESG Consultant tasked with drafting a precise, framework-aligned ESG Summary and Roadmap for the following company based on their self-assessment inputs.
+    # --- Deep ESG Consulting Prompt ---
+    try:
+        info = st.session_state.company_info
+        responses = st.session_state.responses
+        detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
+
+        prompt = f"""You are an experienced ESG Consultant tasked with drafting a precise, framework-aligned ESG Summary and Roadmap for the following company based on their self-assessment inputs.
 
 The report must reflect:
 - Only what is **true based on responses** (avoid assumptions or fake metrics).
@@ -232,49 +228,47 @@ Short advisory note: What should they do in the next 90 days to advance ESG matu
 🧠 Responses:
 {detailed_answers}
 
-Use structured markdown format and avoid vague phrases like "you should consider..." — instead, use confident, actionable sentences. Avoid artificial metrics unless implied by the company’s responses.
-"""
+Use structured markdown format and avoid vague phrases like "you should consider..." — instead, use confident, actionable sentences. Avoid artificial metrics unless implied by the company’s responses."""  # Replace with your actual prompt
 
-    with st.spinner("""
+        with st.spinner("""
 🔍 Generating your ESG Intelligence Report...
 
-We're analyzing your inputs across the **Environmental, Social, and Governance** pillars, aligning them with leading frameworks like **GRI**, **SASB**, **BRSR**, and **UN SDGs**.
+We're analyzing your inputs across the **Environmental, Social, and Governance** pillars, aligning them with frameworks like **GRI**, **SASB**, **BRSR**, and **UN SDGs**.
 
 Please hold on while we prepare:
 - 📊 Maturity Assessment Summary
-- 🗺️ Strategic ESG Roadmap
+- 🗾️ Strategic ESG Roadmap
 - 🧰 Toolkits & Practical Recommendations
 - 🎯 Key KPIs and 90-Day Advisory Plan
 
-This may take up to **a minute**. Thanks for your patience while we create a report that reflects a high-quality consulting output!
+This may take up to **a minute**. Thank you for your patience!
 """):
-        cohere_api_key = st.secrets.get("cohere_api_key")
-        if cohere_api_key:
-            response = requests.post(
-                url="https://api.cohere.ai/v1/chat",
-                headers={
-                    "Authorization": f"Bearer {cohere_api_key}",
-                    "Content-Type": "application/json"
-                },
-                json={"model": "command-r-plus", "message": prompt}
-            )
-            output = response.json()
-            recs = output.get("text") or output.get("response") or "No response received."
-            st.subheader("📓 Premium ESG Recommendations")
-            st.markdown(recs)
-        else:
-            st.warning("⚠️ Cohere API key not found in secrets. Please add `cohere_api_key` to your `.streamlit/secrets.toml` file.")
+            cohere_api_key = st.secrets.get("cohere_api_key")
+            if cohere_api_key:
+                response = requests.post(
+                    url="https://api.cohere.ai/v1/chat",
+                    headers={
+                        "Authorization": f"Bearer {cohere_api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={"model": "command-r-plus", "message": prompt}
+                )
+                output = response.json()
+                recs = output.get("text") or output.get("response") or "No response received."
+                st.subheader("📓 Premium ESG Recommendations")
+                st.markdown(recs)
+            else:
+                st.warning("⚠️ Cohere API key not found in secrets. Please add `cohere_api_key` to your `.streamlit/secrets.toml` file.")
 
-except Exception as e:
-    st.error(f"❌ An error occurred while generating recommendations: {e}")
+        st.download_button("⬇️ Download ESG Report", data=json.dumps({
+            "Company": st.session_state.company_info,
+            "Score": verde_score,
+            "Badge": badge,
+            "Pillar Scores": dict(zip(labels, values)),
+            "Answers": st.session_state.responses
+        }, indent=2), file_name="verdeiq_esg_report.json")
 
+        st.caption("Crafted by Hemaang Patkar")
 
-    st.download_button("Download ESG Report", data=json.dumps({
-        "Company": st.session_state.company_info,
-        "Score": verde_score,
-        "Badge": badge,
-        "Pillar Scores": dict(zip(labels, values)),
-        "Answers": st.session_state.responses
-    }, indent=2), file_name="verdeiq_esg_report.json")
-
-    st.caption("Crafted by Hemaang Patkar")
+    except Exception as e:
+        st.error(f"❌ An error occurred while generating recommendations: {e}")
