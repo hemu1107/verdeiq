@@ -74,6 +74,9 @@ def calculate_scores(responses):
 if st.session_state.page == "intro":
     st.markdown("<div class='title-style'>Welcome to VerdeIQ !</div>", unsafe_allow_html=True)
     st.subheader("ESG Intelligence Simplified")
+
+    st.caption("Crafted by Hemaang Patkar")
+    
     st.markdown("""
     VerdeIQ is your AI-powered ESG self-assessment platform.
 
