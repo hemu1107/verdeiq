@@ -174,85 +174,101 @@ elif st.session_state.page == "results":
         responses = st.session_state.responses
         detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
         prompt = f"""
-You are an expert Senior ESG Consultant with 25+ years of experience advising companies globally on sustainability strategies, regulatory compliance, and ESG transformation. Your task is to generate a personalized, data-backed ESG Assessment Report and Strategic Roadmap for the following company. This report should feel like a $25,000+ consulting engagement, tailored for CXOs, investors, and ESG leads.
+You are an experienced ESG Consultant tasked with drafting a precise, framework-aligned ESG Summary and Roadmap for the following company based on their self-assessment inputs.
+
+The report must reflect:
+- Only what is **true based on responses** (avoid assumptions or fake metrics).
+- Clear alignment with global ESG frameworks such as **GRI**, **SASB**, **BRSR**, and **SDGs** (mapped per question).
+- Professional tone suitable for ESG officers or investors.
+
+---
 
 🏢 **Company Overview**
 - Name: {info.get('name')}
 - Industry: {info.get('industry')}
-- Size: {info.get('size')}
-- Ownership: {info.get('public_status')}
+- Team Size: {info.get('size')}
+- Public Status: {info.get('public_status')}
 - Region: {info.get('region')}
-- Years Operating: {info.get('years_operating')} years
+- Years in Operation: {info.get('years_operating')} years
 - ESG Focus Areas: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
-📊 **VerdeIQ Assessment Summary**
-- *Verde Score*: {verde_score}/100
-- *Environmental Maturity: {values[0]:.2f}/5
-- *Social Maturity*: {values[1]:.2f}/5
-- *Governance Maturity*: {values[2]:.2f}/5
-
-🧠 **Assessment Responses**
-{detailed_answers}
+📊 **Assessment Summary**
+- VerdeIQ Score: {verde_score}/100
+- Badge: {badge}
+- Environmental Maturity: {values[0]:.2f}/5
+- Social Maturity: {values[1]:.2f}/5
+- Governance Maturity: {values[2]:.2f}/5
 
 ---
 
-🎯 **Deliver the following sections in markdown format**:
+🎯 **Deliver the following sections:**
 
-### 1. ESG Summary and Risk Profile
-- High-level materiality scan and score-based diagnosis
-- Risks & opportunities (%) across each pillar, benchmarked against industry best practices & ESG Frameworks like GRI, SASB (industry-specific), BRSR, TCFD
+### 1. ESG Profile Summary
+- Key strengths based on top-rated responses
+- Gaps based on lowest-rated areas
+- Mention ESG frameworks that relate to each pillar (e.g., GRI 305 for emissions)
 
-### 2. Strategic ESG Roadmap
-- Quick Wins (0–6 months): cost-effective initiatives (<$10K)
-- Medium-Term (6–18 months): compliance & capacity building ($10K–$50K)
-- Long-Term (18–36+ months): transformation, ratings, disclosures (>$50K)
-- Use numbers and frameworks wherever possible
+### 2. Customized Roadmap
+Structure it as:
+- **Immediate Next Steps (0–6 months)** – small internal actions or policy creation
+- **Medium-Term (6–18 months)** – tracking, tool adoption, formalization
+- **Long-Term (18–36 months)** – disclosure, audits, certifications
+Do **not** mention budgets unless tied to an actual response (e.g., if they say “We publish ESG reports”, you may suggest external audits)
 
-### 3. Pillar-Wise Maturity Evaluation
-- For each pillar: key gaps, strengths, and next-level actions
-- Include applicable frameworks like GRI, SASB (industry-specific), BRSR, TCFD, and SDG goals (e.g., SDG 13 for climate)
+### 3. Pillar-Wise Breakdown
+For each of Environmental, Social, and Governance:
+- Highlight top 1–2 strengths and top 1–2 improvement areas
+- Connect each point to a relevant ESG framework (like GRI 404 for employee training, GRI 418 for data privacy)
 
-### 4. Toolkits, Templates, and Digital Aids
-- Suggest ESG software, carbon calculators, or dashboards by company size
-- Recommend reporting templates (e.g., DEI dashboards, supplier code, whistleblower policies)
+### 4. Tool & Template Suggestions
+Only suggest tools or templates that match their current stage (e.g., spreadsheets vs dashboards vs audit software)
+Mention practical tools (e.g., GHG Protocol, SDG Tracker, DEI dashboards, Conflict of Interest policy templates)
 
-### 5. Case Study Analogues
-- Real-world examples of similar companies improving ESG maturity
-- Link actions to measurable outcomes (e.g., % waste reduction, carbon offset, female leadership % increase)
+### 5. Closing Advisory
+Short advisory note: What should they do in the next 90 days to advance ESG maturity confidently?
 
-### 6. Key KPIs and Milestones
-- Suggested KPIs in % or ratio format (e.g., Scope 1 emissions/revenue, % training completion)
-- Yearly milestone checklists (Y1, Y2, Y3)
+---
 
-### 7. Implementation Risk Assessment
-- Highlight organizational blockers (data quality, awareness, cost)
-- Provide mitigation advice per blocker
+🧠 Responses:
+{detailed_answers}
 
-### 8. Strategic Call-to-Action
-- Advisory-style closing paragraph with clear guidance for next 90 days
-
-Make sure your language is confident, analytical, and reflective of a premium ESG consulting tone. Include bullet points, ratios, dollar cost brackets, and action verbs.
+Use structured markdown format and avoid vague phrases like "you should consider..." — instead, use confident, actionable sentences. Avoid artificial metrics unless implied by the company’s responses.
 """
 
-        with st.spinner("Generating ESG recommendations - aspects would include Current Analysis, Roadmap, Toolkits, Key KPIs & Milestones, Implementation Risks, Strategic CTAs & much more, Buffer time would be at max about a minute, Thanks for your patience!"):
-            cohere_api_key = st.secrets.get("cohere_api_key")
-            if cohere_api_key:
-                response = requests.post(
-                    url="https://api.cohere.ai/v1/chat",
-                    headers={
-                        "Authorization": f"Bearer {cohere_api_key}",
-                        "Content-Type": "application/json"
-                    },
-                    json={"model": "command-r-plus", "message": prompt}
-                )
-                output = response.json()
-                recs = output.get("text") or output.get("response") or "No response received."
-                st.subheader("📓 Premium ESG Recommendations")
-                st.markdown(recs)
-            else:
-                st.warning("Cohere API key not found in secrets. Add `cohere_api_key` to `.streamlit/secrets.toml`.")
-    except Exception as e:
-        st.error(f"Error while generating recommendations: {e}")
+
+        try:
+    with st.spinner("""
+🔍 Generating your ESG Intelligence Report...
+
+We're analyzing your inputs across the **Environmental, Social, and Governance** pillars, aligning them with leading frameworks like **GRI**, **SASB**, **BRSR**, and **UN SDGs**.
+
+Please hold on while we prepare:
+- 📊 Maturity Assessment Summary
+- 🗺️ Strategic ESG Roadmap
+- 🧰 Toolkits & Practical Recommendations
+- 🎯 Key KPIs and 90-Day Advisory Plan
+
+This may take up to **a minute**. Thanks for your patience while we create a report that reflects a high-quality consulting output!
+"""):
+        cohere_api_key = st.secrets.get("cohere_api_key")
+        if cohere_api_key:
+            response = requests.post(
+                url="https://api.cohere.ai/v1/chat",
+                headers={
+                    "Authorization": f"Bearer {cohere_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json={"model": "command-r-plus", "message": prompt}
+            )
+            output = response.json()
+            recs = output.get("text") or output.get("response") or "No response received."
+            st.subheader("📓 Premium ESG Recommendations")
+            st.markdown(recs)
+        else:
+            st.warning("⚠️ Cohere API key not found in secrets. Please add `cohere_api_key` to your `.streamlit/secrets.toml` file.")
+except Exception as e:
+    st.error(f"❌ An error occurred while generating recommendations: {e}")
+
 
     st.download_button("Download ESG Report", data=json.dumps({
         "Company": st.session_state.company_info,
