@@ -1,4 +1,5 @@
 streamlit
 fpdf
+verdeiq_logo.png.png
 plotly
 requests
