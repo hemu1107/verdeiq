@@ -82,7 +82,8 @@ if st.session_state.page == "intro":
 
     - 💡 Answer 15 core ESG questions
     - 📊 Get scored 0-100 + detailed insights
-    - 🌍 Frameworks used: **GRI**, **SASB**, **BRSR**, and **UN SDGs**
+    - 🌍 Frameworks aligned include **GRI**, **SASB**, **BRSR**, and **UN SDGs**
+    - ⚡ Get Instant Reccomendations & Detailed Roadmap within mins!
 
     **Score Tiers:**
     - 🌱 Seedling (0–29)
