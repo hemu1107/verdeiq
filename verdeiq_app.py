@@ -116,7 +116,7 @@ elif st.session_state.page == "details":
             st.session_state.company_info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", ["Yes", "No", "In Progress"])
             st.session_state.company_info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", ["Yes", "No"])
         with c2:
-            st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500+"])
+            st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"])
             st.session_state.company_info['esg_goals'] = st.multiselect("Core ESG Intentions", [
                 "Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
             st.session_state.company_info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"])
@@ -127,7 +127,7 @@ elif st.session_state.page == "details":
             st.session_state.company_info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", ["Low", "Moderate", "High"])
 
         st.session_state.company_info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
-        st.session_state.company_info['years_operating'] = st.slider("Years Since Founding", 0, 100, 5)
+        st.session_state.company_info['years_operating'] = st.slider("Years Since Founding", 0, 200, 5)
 
         if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
