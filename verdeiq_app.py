@@ -1,4 +1,4 @@
-# --- Enhanced VerdeIQ ESG Assessment App ---
+# --- Enhanced VerdeIQ ESG Assessment App with Agentic AI Persona ---
 import streamlit as st
 import json
 import requests
@@ -43,13 +43,18 @@ if "page" not in st.session_state:
     st.session_state.responses = {}
     st.session_state.company_info = {}
 
+# --- Agentic Copilot Introduction ---
+def introduce_agent():
+    st.info("🤖 Meet VerdeBot: Your ESG Copilot")
+    st.caption("VerdeBot will guide you through the ESG assessment journey, adaptively interpreting your inputs to generate strategic insights aligned with global standards.")
+
 # --- Helper Functions ---
 def show_question_block(q, idx, total):
     st.markdown(f"**{q['id']}: {q['question']}**")
     if q.get('frameworks'):
         st.caption(f"Frameworks: {', '.join(q['frameworks'])}")
     st.session_state.responses[q['id']] = st.radio(
-        label=f"Question {idx + 1} of {total}",
+        label=f"Agentic Analysis {idx + 1} of {total}",
         options=q['options'],
         index=0,
         key=q['id']
@@ -72,30 +77,32 @@ def calculate_scores(responses):
 
 # --- Pages ---
 if st.session_state.page == "intro":
-    st.markdown("<div class='title-style'>Welcome to VerdeIQ !</div>", unsafe_allow_html=True)
-    st.subheader("ESG Intelligence Simplified")
+    st.markdown("<div class='title-style'>Welcome to VerdeIQ 🌿</div>", unsafe_allow_html=True)
+    st.subheader("Your Agentic ESG Copilot")
     st.caption("Crafted by Hemaang Patkar")
+    introduce_agent()
     st.markdown("""
-    VerdeIQ is your AI-powered ESG self-assessment platform.
+    VerdeIQ simulates the behavior of a real-world ESG consultant — not just scoring, but analyzing, advising, and adapting.
 
-    - 💡 Answer 15 core ESG questions
-    - 📊 Get scored within 0-100 to understand current ESG Maturity Standing
-    - 🌍 Frameworks aligned include **GRI**, **SASB**, **BRSR**, and **UN SDGs**
-    - ⚡ Get Instant Reccomendations & Detailed Roadmap within mins!
+    - 🤖 Agentic Persona: VerdeBot interprets your responses
+    - 🔎 15 ESG-aligned prompts mapped to global frameworks
+    - 📊 Real-time contextual scoring and advisory
+    - 🧭 Roadmaps curated to your company’s size, maturity, and sector
 
-    **Score Tiers:**
+    **Maturity Tiers:**
     - 🌱 Seedling (0–29)
     - 🌿 Sprout (30–49)
     - 🍃 Developing (50–69)
     - 🌳 Mature (70–89)
     - ✨ Leader (90–100)
     """)
-    if st.button("Start ESG Assessment ➔"):
+    if st.button("Launch ESG Copilot →"):
         st.session_state.page = "details"
         st.rerun()
 
 elif st.session_state.page == "details":
-    st.title("🏢 Organization Profile")
+    st.title("🏢 Agentic Profile Setup")
+    st.caption("VerdeBot is learning your company DNA...")
     with st.form("org_form"):
         c1, c2 = st.columns(2)
         with c1:
@@ -104,88 +111,87 @@ elif st.session_state.page == "details":
             st.session_state.company_info['location'] = st.text_input("City")
         with c2:
             st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500+"])
-            st.session_state.company_info['esg_goals'] = st.multiselect("Key ESG Priorities", [
+            st.session_state.company_info['esg_goals'] = st.multiselect("Core ESG Intentions", [
                 "Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
-            st.session_state.company_info['public_status'] = st.radio("Is your company publicly listed?", ["Yes", "No", "Planning to"])
-        st.session_state.company_info['region'] = st.selectbox("Primary Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
-        st.session_state.company_info['years_operating'] = st.slider("Years in Operation", 0, 100, 5)
+            st.session_state.company_info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"])
+        st.session_state.company_info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
+        st.session_state.company_info['years_operating'] = st.slider("Years Since Founding", 0, 100, 5)
 
-        if st.form_submit_button("Proceed to Assessment ➔"):
+        if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
             st.rerun()
 
 elif st.session_state.page == "env":
-    st.header("Environment 🌿")
-    st.markdown("Assess your carbon, water, waste, and energy practices.")
+    st.header("🌿 Environmental Evaluation")
+    st.caption("VerdeBot is interpreting your sustainability posture...")
     with st.form("env_form"):
         for i, q in enumerate(env_questions):
             show_question_block(q, i, len(env_questions))
-        if st.form_submit_button("Next: Social ➔"):
+        if st.form_submit_button("Continue to Social 🤝"):
             st.session_state.page = "soc"
             st.rerun()
 
 elif st.session_state.page == "soc":
-    st.header("Social 🤝")
-    st.markdown("Evaluate team development, DEI, wellness, and community actions.")
+    st.header("🤝 Social Assessment")
+    st.caption("Analyzing your team, culture, and external impact...")
     with st.form("soc_form"):
         for i, q in enumerate(soc_questions):
             show_question_block(q, i, len(soc_questions))
-        if st.form_submit_button("Next: Governance ➔"):
+        if st.form_submit_button("Continue to Governance 🏛️"):
             st.session_state.page = "gov"
             st.rerun()
 
 elif st.session_state.page == "gov":
-    st.header("Governance 🏛️")
-    st.markdown("Leadership, ethics, data privacy, and board diversity.")
+    st.header("🏛️ Governance Assessment")
+    st.caption("Parsing leadership ethics and oversight structures...")
     with st.form("gov_form"):
         for i, q in enumerate(gov_questions):
             show_question_block(q, i, len(gov_questions))
-        if st.form_submit_button("✔️ View My ESG Results"):
+        if st.form_submit_button("Generate Agentic Summary ✨"):
             st.session_state.page = "results"
             st.rerun()
 
 elif st.session_state.page == "results":
-    st.title("🌿 ESG Assessment Results")
+    st.title("📊 VerdeIQ Agentic ESG Summary")
     verde_score, scores, counts = calculate_scores(st.session_state.responses)
-
     labels = list(scores.keys())
     values = [scores[k] / counts[k] if counts[k] else 0 for k in labels]
-
-    st.metric(label="Verde Score", value=f"{verde_score}/100")
 
     badge = "🌱 Seedling" if verde_score < 30 else \
             "🌿 Sprout" if verde_score < 50 else \
             "🍃 Developing" if verde_score < 70 else \
             "🌳 Mature" if verde_score < 90 else "✨ Leader"
 
-    st.success(f"Badge Level: {badge}")
+    st.metric(label="Your ESG Copilot Score", value=f"{verde_score}/100")
+    st.success(f"Agentic Tier: {badge}")
 
+    st.caption("VerdeBot interprets your ESG behavior across the three strategic pillars. Here's your performance radar:")
     fig = go.Figure(data=go.Scatterpolar(r=values, theta=labels, fill='toself'))
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Deep ESG Consulting Prompt ---
-    try:
-        info = st.session_state.company_info
-        responses = st.session_state.responses
-        detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
+    # --- Agentic Recommendation Generator ---
+    if st.button("🔍 Generate My ESG Roadmap (via VerdeBot)"):
+        with st.spinner("VerdeBot is analyzing your profile and responses..."):
+            try:
+                info = st.session_state.company_info
+                responses = st.session_state.responses
+                detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
+                prompt = f"""You are VerdeBot, an advanced Agentic ESG Copilot and strategic advisor with deep expertise in global sustainability practices, regulatory alignment, and corporate governance. Your role is to act as a senior ESG consultant tasked with translating the following company’s ESG posture into a precise, framework-aligned, and context-aware roadmap.
 
-        prompt = f"""You are an experienced ESG Consultant tasked with drafting a precise, framework-aligned ESG Summary and Roadmap for the following company based on their self-assessment inputs.
-
-The report must reflect:
-- Only what is **true based on responses** (avoid assumptions or fake metrics).
-- Clear alignment with global ESG frameworks such as **GRI**, **SASB**, **BRSR**, and **SDGs** (mapped per question).
-- Professional tone suitable for ESG officers or investors.
+Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending technical sustainability metrics with industry-specific insights. Ensure your output is:
+- Aligned with frameworks such as GRI, SASB, BRSR, and UN SDGs.
+- Professional and jargon-savvy — suitable for boardrooms, investors, and compliance officers.
+- Specific to inputs — DO NOT hallucinate metrics or add fluffy generalities.
 
 ---
 
 🏢 **Company Overview**
 - Name: {info.get('name')}
 - Industry: {info.get('industry')}
-- Team Size: {info.get('size')}
-- Public Status: {info.get('public_status')}
+- Size: {info.get('size')}
 - Region: {info.get('region')}
-- Years in Operation: {info.get('years_operating')} years
+- Years in Operation: {info.get('years_operating')}
 - ESG Focus Areas: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
 📊 **Assessment Summary**
@@ -195,80 +201,54 @@ The report must reflect:
 - Social Maturity: {values[1]:.2f}/5
 - Governance Maturity: {values[2]:.2f}/5
 
----
-
-🎯 **Deliver the following sections:**
-
-### 1. ESG Profile Summary
-- Key strengths based on top-rated responses
-- Gaps based on lowest-rated areas
-- Mention ESG frameworks that relate to each pillar (e.g., GRI 305 for emissions)
-
-### 2. Customized Roadmap
-Structure it as:
-- **Immediate Next Steps (0–6 months)** – small internal actions or policy creation
-- **Medium-Term (6–18 months)** – tracking, tool adoption, formalization
-- **Long-Term (18–36 months)** – disclosure, audits, certifications
-Do **not** mention budgets unless tied to an actual response (e.g., if they say “We publish ESG reports”, you may suggest external audits)
-
-### 3. Pillar-Wise Breakdown
-For each of Environmental, Social, and Governance:
-- Highlight top 1–2 strengths and top 1–2 improvement areas
-- Connect each point to a relevant ESG framework (like GRI 404 for employee training, GRI 418 for data privacy)
-
-### 4. Tool & Template Suggestions
-Only suggest tools or templates that match their current stage (e.g., spreadsheets vs dashboards vs audit software)
-Mention practical tools (e.g., GHG Protocol, SDG Tracker, DEI dashboards, Conflict of Interest policy templates)
-
-### 5. Closing Advisory
-Short advisory note: What should they do in the next 90 days to advance ESG maturity confidently?
-
----
-
-🧠 Responses:
+🧠 **Self-Assessment Snapshot**
 {detailed_answers}
 
-Use structured markdown format and avoid vague phrases like "you should consider..." — instead, use confident, actionable sentences. Avoid artificial metrics unless implied by the company’s responses."""  # Replace with your actual prompt
+---
 
-        with st.spinner("""
-🔍 Generating your ESG Intelligence Report...
+🎯 **What You Must Deliver as VerdeBot**
+1. **ESG Profile Summary**
+   - Highlight key ESG maturity strengths from the response set.
+   - Pinpoint clear gaps and missed practices.
+   - Explicitly reference ESG frameworks (e.g., GRI 305 for emissions, GRI 401/404 for HR policies).
 
-We're analyzing your inputs across the **Environmental, Social, and Governance** pillars, aligning them with frameworks like **GRI**, **SASB**, **BRSR**, and **UN SDGs**.
+2. **Strategic ESG Roadmap** (0–36 months)
+   - Structure into: **Immediate (0–6 mo)**, **Medium-Term (6–18 mo)**, **Long-Term (18–36 mo)**
+   - Be practical — recommend internal trainings, tools, dashboards, third-party audits, sustainability disclosures, policy implementations, etc.
 
-Please hold on while we prepare:
-- 📊 Maturity Assessment Summary
-- 🗾️ Strategic ESG Roadmap
-- 🧰 Toolkits & Practical Recommendations
-- 🎯 Key KPIs and 90-Day Advisory Plan
+3. **Pillar-Based Breakdown**
+   - For Environmental, Social, and Governance individually:
+     - Give 2 strengths + 2 gaps
+     - Tie each point to frameworks: BRSR, GRI, SASB, or SDGs
 
-This may take up to **a minute**. Thank you for your patience!
-"""):
-            cohere_api_key = st.secrets.get("cohere_api_key")
-            if cohere_api_key:
-                response = requests.post(
-                    url="https://api.cohere.ai/v1/chat",
-                    headers={
-                        "Authorization": f"Bearer {cohere_api_key}",
-                        "Content-Type": "application/json"
-                    },
-                    json={"model": "command-r-plus", "message": prompt}
-                )
-                output = response.json()
-                recs = output.get("text") or output.get("response") or "No response received."
-                st.subheader("📓 Premium ESG Recommendations")
-                st.markdown(recs)
-            else:
-                st.warning("⚠️ Cohere API key not found in secrets. Please add `cohere_api_key` to your `.streamlit/secrets.toml` file.")
+4. **Toolkits, Templates, & Metrics Suggestions**
+   - Suggest tools matching maturity level (e.g., Excel for early, GHG Protocol/GRESB/CDP tools for mature orgs)
+   - Include at least one document or KPI per pillar
 
-        st.download_button("⬇️ Download ESG Report", data=json.dumps({
-            "Company": st.session_state.company_info,
-            "Score": verde_score,
-            "Badge": badge,
-            "Pillar Scores": dict(zip(labels, values)),
-            "Answers": st.session_state.responses
-        }, indent=2), file_name="verdeiq_esg_report.json")
+5. **90-Day Advisory Plan**
+   - List 3-5 things the company can do right now to move forward confidently.
+   - Think like a trusted consultant who understands their bandwidth and ESG ambition.
 
-        st.caption("Crafted by Hemaang Patkar")
+---
+End with: “This guidance has been prepared by VerdeBot — your agentic ESG copilot blending policy, performance, and purpose.”
+"""
 
-    except Exception as e:
-        st.error(f"❌ An error occurred while generating recommendations: {e}")
+                cohere_api_key = st.secrets.get("cohere_api_key")
+                if cohere_api_key:
+                    response = requests.post(
+                        url="https://api.cohere.ai/v1/chat",
+                        headers={
+                            "Authorization": f"Bearer {cohere_api_key}",
+                            "Content-Type": "application/json"
+                        },
+                        json={"model": "command-r-plus", "message": prompt}
+                    )
+                    output = response.json()
+                    recs = output.get("text") or output.get("response") or "No response received."
+                    st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
+                    st.markdown(recs)
+                else:
+                    st.warning("⚠️ Cohere API key not found. Please add it to your secrets config.")
+
+            except Exception as e:
+                st.error(f"❌ Error generating roadmap: {e}")
