@@ -186,8 +186,18 @@ elif st.session_state.page == "results":
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Agentic Recommendation Generator ---
-    if st.button("🔍 Generate My ESG Roadmap (via VerdeBot)"):
-        with st.spinner("VerdeBot is analyzing your profile and responses..."):
+    if st.button("🔍 Generate My ESG Analysis & Roadmap (via VerdeBot)"):
+        with st.spinner(""""
+🧠 VerdeBot is now synthesizing your ESG profile...
+
+Leveraging its Agentic AI architecture, VerdeBot is:
+- Mapping your responses across Environmental, Social, and Governance domains
+- Cross-referencing data with global ESG frameworks (GRI, SASB, BRSR, SDGs)
+- Evaluating governance maturity, climate risk preparedness, and ESG team strength
+- Curating a strategic roadmap tailored to your company's sector, scale, and ambitions
+
+⏳ This process may take up to **a minute**. Thank you for your patience as VerdeBot formulates deeply contextual recommendations fit for boardrooms and sustainability leaders.
+""""):
             try:
                 info = st.session_state.company_info
                 responses = st.session_state.responses
