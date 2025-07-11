@@ -87,7 +87,7 @@ if st.session_state.page == "intro":
     - 🤖 Agentic Persona: VerdeBot interprets your responses
     - 🔎 15 ESG-aligned prompts mapped to global frameworks
     - 📊 Real-time contextual scoring and advisory
-    - 🧭 Roadmaps curated to your company’s size, maturity, and sector
+    - 🛍️ Roadmaps curated to your company’s size, maturity, and sector
 
     **Maturity Tiers:**
     - 🌱 Seedling (0–29)
@@ -109,17 +109,32 @@ elif st.session_state.page == "details":
             st.session_state.company_info['name'] = st.text_input("Company Name")
             st.session_state.company_info['industry'] = st.text_input("Industry")
             st.session_state.company_info['location'] = st.text_input("City")
+            st.session_state.company_info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", ["Local", "Regional", "Global"])
+            st.session_state.company_info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", ["Yes", "No"])
+            st.session_state.company_info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", ["Yes", "No", "Planned"])
+            st.session_state.company_info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", ["Yes", "No"])
+            st.session_state.company_info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", ["Yes", "No", "In Progress"])
+            st.session_state.company_info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", ["Yes", "No"])
         with c2:
             st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500+"])
             st.session_state.company_info['esg_goals'] = st.multiselect("Core ESG Intentions", [
                 "Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
             st.session_state.company_info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"])
+            st.session_state.company_info['sector_type'] = st.radio("Sector Type", ["Manufacturing", "IT/Services", "Finance", "Healthcare", "Other"])
+            st.session_state.company_info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", ["0", "1-2", "3-5", "6-10", "10+"])
+            st.session_state.company_info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", ["Yes", "No"])
+            st.session_state.company_info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", ["Yes", "No"])
+            st.session_state.company_info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", ["Low", "Moderate", "High"])
+
         st.session_state.company_info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
         st.session_state.company_info['years_operating'] = st.slider("Years Since Founding", 0, 100, 5)
 
         if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
             st.rerun()
+
+# (Remaining code continues unchanged)
+
 
 elif st.session_state.page == "env":
     st.header("🌿 Environmental Evaluation")
@@ -186,15 +201,30 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
 
 ---
 
-🏢 **Company Overview**
+🏢 **Company Profile**
 - Name: {info.get('name')}
 - Industry: {info.get('industry')}
-- Size: {info.get('size')}
+- Sector Type: {info.get('sector_type')}
+- Team Size: {info.get('size')}
+- ESG Team Size: {info.get('esg_team_size')}
+- Public Status: {info.get('public_status')}
 - Region: {info.get('region')}
 - Years in Operation: {info.get('years_operating')}
-- ESG Focus Areas: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
+- Main City: {info.get('location')}
+- Operational Reach: {info.get('supply_chain_exposure')}
+- Regulatory Risk Level: {info.get('regulatory_exposure')}
+- Core ESG Intentions: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
-📊 **Assessment Summary**
+📄 **Governance & Policy Indicators**
+- Materiality Assessment: {info.get('materiality_assessment_status')}
+- ESG Board Committee: {info.get('board_esg_committee')}
+- Climate Risk Policy: {info.get('climate_risk_policy')}
+- Internal ESG Training: {info.get('internal_esg_training')}
+- Carbon Disclosure: {info.get('carbon_disclosure')}
+- Third-Party ESG Audits: {info.get('third_party_audits')}
+- Stakeholder Reporting: {info.get('stakeholder_reporting')}
+
+📊 **Assessment Results**
 - VerdeIQ Score: {verde_score}/100
 - Badge: {badge}
 - Environmental Maturity: {values[0]:.2f}/5
@@ -206,31 +236,35 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
 
 ---
 
-🎯 **What You Must Deliver as VerdeBot**
+🎯 **Your Task as VerdeBot**
+
+Deliver a structured and deeply tailored ESG Advisory Report. Structure it with the following sections:
+
 1. **ESG Profile Summary**
-   - Highlight key ESG maturity strengths from the response set.
-   - Pinpoint clear gaps and missed practices.
-   - Explicitly reference ESG frameworks (e.g., GRI 305 for emissions, GRI 401/404 for HR policies).
+   - Showcase strengths across the 3 pillars based on maturity scores and profile fields.
+   - Identify 3–5 gaps considering disclosures, governance, training, and risk.
+   - Reference ESG frameworks like GRI 305, SASB Standards, BRSR Principle 3, SDG 12, etc.
 
-2. **Strategic ESG Roadmap** (0–36 months)
-   - Structure into: **Immediate (0–6 mo)**, **Medium-Term (6–18 mo)**, **Long-Term (18–36 mo)**
-   - Be practical — recommend internal trainings, tools, dashboards, third-party audits, sustainability disclosures, policy implementations, etc.
+2. **Roadmap (0–36 Months)**
+   - **Immediate (0–6 months):** Internal capacity-building, audits, dashboards, materiality clarifications.
+   - **Mid-Term (6–18 months):** Stakeholder engagement, GRI-aligned reporting, risk-based action plans.
+   - **Long-Term (18–36 months):** Third-party disclosures, ESG ratings readiness, governance reform.
 
-3. **Pillar-Based Breakdown**
-   - For Environmental, Social, and Governance individually:
-     - Give 2 strengths + 2 gaps
-     - Tie each point to frameworks: BRSR, GRI, SASB, or SDGs
+3. **Pillar-Wise Breakdown**
+   - 2–3 recommendations per pillar.
+   - Tie each point to global ESG frameworks and relevant tools.
 
-4. **Toolkits, Templates, & Metrics Suggestions**
-   - Suggest tools matching maturity level (e.g., Excel for early, GHG Protocol/GRESB/CDP tools for mature orgs)
-   - Include at least one document or KPI per pillar
+4. **Tools & Metrics**
+   - Suggest tools, templates, and documents to use immediately (aligned to company maturity).
+   - E.g., CDP portal, SASB Navigator, DEI dashboards, ESG risk register.
 
 5. **90-Day Advisory Plan**
-   - List 3-5 things the company can do right now to move forward confidently.
-   - Think like a trusted consultant who understands their bandwidth and ESG ambition.
+   - List 4–5 tactical, confidence-building actions.
 
 ---
-End with: “This guidance has been prepared by VerdeBot — your agentic ESG copilot blending policy, performance, and purpose.”
+
+🔒 Close by saying:
+“This roadmap was synthesized by VerdeBot — your intelligent ESG copilot engineered to embed sustainability into strategy, purpose into performance.”
 """
 
                 cohere_api_key = st.secrets.get("cohere_api_key")
