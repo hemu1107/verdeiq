@@ -196,8 +196,7 @@ Leveraging its Agentic AI architecture, VerdeBot is:
 - Evaluating governance maturity, climate risk preparedness, and ESG team strength
 - Curating a strategic roadmap tailored to your company's sector, scale, and ambitions
 
-⏳ This process may take up to **a minute**. Thank you for your patience as VerdeBot formulates deeply contextual recommendations fit for boardrooms and sustainability leaders.
-""""):
+⏳ This process may take up to **a minute**. Thank you for your patience as VerdeBot formulates deeply contextual recommendations fit for boardrooms and sustainability leaders.""""):
             try:
                 info = st.session_state.company_info
                 responses = st.session_state.responses
