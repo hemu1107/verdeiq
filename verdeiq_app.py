@@ -67,6 +67,10 @@ st.markdown("""
 # This function is cached to prevent reloading the JSON on every rerun.
 @st.cache_data
 def load_questions():
+    """
+    Loads ESG questions from a JSON file.
+    Caches the data to avoid re-loading on every Streamlit rerun.
+    """
     file_path = Path("esg_questions.json")
     if not file_path.exists():
         st.error("Error: 'esg_questions.json' file not found. Please ensure it's in the same directory.")
@@ -103,6 +107,7 @@ if "page" not in st.session_state:
     st.session_state.responses = {}
     st.session_state.company_info = {}
     st.session_state.current_page_index = 0 # For progress bar
+    st.session_state.results_generated = False # New state to lock navigation
 
 # --- Sidebar Navigation ---
 pages = ["intro", "details", "env", "soc", "gov", "review", "results"]
@@ -128,14 +133,16 @@ with st.sidebar:
     for i, p in enumerate(pages):
         # Disable navigation to future pages until current one is filled (optional but good for guided flow)
         # For simplicity, allowing back navigation but keeping forward linear for now.
+        # Modified navigation logic: If results are generated, disable all navigation except the current page.
+        is_disabled = (st.session_state.results_generated and p != st.session_state.page) or \
+                      (i > st.session_state.current_page_index and not st.session_state.results_generated)
+        
         if p == st.session_state.page:
             st.markdown(f"**➤ {titles[p]}**")
-        elif i < st.session_state.current_page_index: # Allow navigating back
-            if st.button(titles[p], key=f"sidebar_btn_{p}"):
+        else:
+            if st.button(titles[p], key=f"sidebar_btn_{p}", disabled=is_disabled):
                 st.session_state.page = p
                 st.rerun()
-        else: # Future pages
-            st.button(titles[p], key=f"sidebar_btn_{p}", disabled=True)
     st.markdown("---")
     
 # --- Helper Functions ---
@@ -146,9 +153,15 @@ def show_question_block(q, idx, total):
         st.caption(f"**Framework Alignment:** {', '.join(q['frameworks'])} _(VerdeBot considers these for detailed analysis)_")
     
     # Pre-select the existing response if available
+    # Ensure that current_response_index is valid, otherwise default to 0
     current_response_index = 0
     if q['id'] in st.session_state.responses and st.session_state.responses[q['id']] in q['options']:
-        current_response_index = q['options'].index(st.session_state.responses[q['id']])
+        try:
+            current_response_index = q['options'].index(st.session_state.responses[q['id']])
+        except ValueError:
+            # If the stored response is no longer in options (e.g., questions changed), default to 0
+            current_response_index = 0
+
 
     st.session_state.responses[q['id']] = st.radio(
         label=f"Your Current Stance ({idx + 1} of {total})",
@@ -201,8 +214,6 @@ if st.session_state.page == "intro":
     st.subheader("Your Agentic ESG Copilot")
     st.caption("Crafted by Hemaang Patkar")
     
-
-
     st.markdown("""
     **VerdeIQ** simulates the behavior of a real-world ESG consultant. It doesn't just score; it **analyzes**, **advises**, and **adapts** based on your company's unique profile.
 
@@ -234,58 +245,118 @@ elif st.session_state.page == "details":
     st.caption("VerdeBot is learning your company's DNA to provide the most relevant analysis. The more detail, the smarter your copilot becomes!")
     
     with st.form("org_form"):
+        info = st.session_state.company_info # Reference the session state dictionary directly
+
         c1, c2 = st.columns(2)
         with c1:
-            info = st.session_state.company_info
             info['name'] = st.text_input("Company Name", value=info.get('name', ''))
             info['industry'] = st.text_input("Industry", value=info.get('industry', ''))
             info['location'] = st.text_input("City", value=info.get('location', ''))
             
-            # Ensure index is correctly set for selectbox
             supply_chain_options = ["Local", "Regional", "Global"]
-            info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", supply_chain_options, index=supply_chain_options.index(info.get('supply_chain_exposure', "Local")))
+            info['supply_chain_exposure'] = st.selectbox(
+                "Supply Chain Exposure", 
+                supply_chain_options, 
+                index=supply_chain_options.index(info.get('supply_chain_exposure', "Local"))
+            )
             
             carbon_disclosure_options = ["Yes", "No"]
-            info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", carbon_disclosure_options, index=carbon_disclosure_options.index(info.get('carbon_disclosure', "No")))
+            info['carbon_disclosure'] = st.radio(
+                "Discloses Carbon Emissions?", 
+                carbon_disclosure_options, 
+                index=carbon_disclosure_options.index(info.get('carbon_disclosure', "No"))
+            )
             
             third_party_options = ["Yes", "No", "Planned"]
-            info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", third_party_options, index=third_party_options.index(info.get('third_party_audits', "No")))
+            info['third_party_audits'] = st.radio(
+                "Undergoes 3rd-Party ESG Audits?", 
+                third_party_options, 
+                index=third_party_options.index(info.get('third_party_audits', "No"))
+            )
             
             stakeholder_options = ["Yes", "No"]
-            info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", stakeholder_options, index=stakeholder_options.index(info.get('stakeholder_reporting', "No")))
+            info['stakeholder_reporting'] = st.radio(
+                "Publishes Stakeholder Reports?", 
+                stakeholder_options, 
+                index=stakeholder_options.index(info.get('stakeholder_reporting', "No"))
+            )
             
             materiality_options = ["Yes", "No", "In Progress"]
-            info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", materiality_options, index=materiality_options.index(info.get('materiality_assessment_status', "No")))
+            info['materiality_assessment_status'] = st.radio(
+                "Materiality Assessment Conducted?", 
+                materiality_options, 
+                index=materiality_options.index(info.get('materiality_assessment_status', "No"))
+            )
             
             board_esg_options = ["Yes", "No"]
-            info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", board_esg_options, index=board_esg_options.index(info.get('board_esg_committee', "No")))
+            info['board_esg_committee'] = st.radio(
+                "Board-Level ESG Committee?", 
+                board_esg_options, 
+                index=board_esg_options.index(info.get('board_esg_committee', "No"))
+            )
         with c2:
             team_size_options = ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"]
-            info['size'] = st.selectbox("Team Size", team_size_options, index=team_size_options.index(info.get('size', "1-10")))
+            info['size'] = st.selectbox(
+                "Team Size", 
+                team_size_options, 
+                index=team_size_options.index(info.get('size', "1-10"))
+            )
             
             esg_goals_options = ["Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"]
-            info['esg_goals'] = st.multiselect("Core ESG Intentions", esg_goals_options, default=info.get('esg_goals', []))
+            info['esg_goals'] = st.multiselect(
+                "Core ESG Intentions", 
+                esg_goals_options, 
+                default=info.get('esg_goals', [])
+            )
             
             public_status_options = ["Yes", "No", "Planning to"]
-            info['public_status'] = st.radio("Listed Status", public_status_options, index=public_status_options.index(info.get('public_status', "No")))
+            info['public_status'] = st.radio(
+                "Listed Status", 
+                public_status_options, 
+                index=public_status_options.index(info.get('public_status', "No"))
+            )
             
             sector_type_options = list(industry_weights.keys())
-            info['sector_type'] = st.radio("Sector Type", sector_type_options, index=sector_type_options.index(info.get('sector_type', "Other")))
+            info['sector_type'] = st.radio(
+                "Sector Type", 
+                sector_type_options, 
+                index=sector_type_options.index(info.get('sector_type', "Other"))
+            )
             
             esg_team_size_options = ["0", "1-2", "3-5", "6-10", "10+"]
-            info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", esg_team_size_options, index=esg_team_size_options.index(info.get('esg_team_size', "0")))
+            info['esg_team_size'] = st.selectbox(
+                "Dedicated ESG Team Size", 
+                esg_team_size_options, 
+                index=esg_team_size_options.index(info.get('esg_team_size', "0"))
+            )
             
             internal_training_options = ["Yes", "No"]
-            info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", internal_training_options, index=internal_training_options.index(info.get('internal_esg_training', "No")))
+            info['internal_esg_training'] = st.radio(
+                "Internal ESG Training Programs?", 
+                internal_training_options, 
+                index=internal_training_options.index(info.get('internal_esg_training', "No"))
+            )
             
             climate_risk_options = ["Yes", "No"]
-            info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", climate_risk_options, index=climate_risk_options.index(info.get('climate_risk_policy', "No")))
+            info['climate_risk_policy'] = st.radio(
+                "Climate Risk Mitigation Policy?", 
+                climate_risk_options, 
+                index=climate_risk_options.index(info.get('climate_risk_policy', "No"))
+            )
             
             regulatory_exposure_options = ["Low", "Moderate", "High"]
-            info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", regulatory_exposure_options, index=regulatory_exposure_options.index(info.get('regulatory_exposure', "Low")))
+            info['regulatory_exposure'] = st.selectbox(
+                "Regulatory Exposure", 
+                regulatory_exposure_options, 
+                index=regulatory_exposure_options.index(info.get('regulatory_exposure', "Low"))
+            )
 
         region_options = ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"]
-        info['region'] = st.selectbox("Main Operational Region", region_options, index=region_options.index(info.get('region', "North America")))
+        info['region'] = st.selectbox(
+            "Main Operational Region", 
+            region_options, 
+            index=region_options.index(info.get('region', "North America"))
+        )
         
         info['years_operating'] = st.slider("Years Since Founding", 0, 200, info.get('years_operating', 5))
         
@@ -295,13 +366,13 @@ elif st.session_state.page == "details":
         if isinstance(current_esg_report_date, str):
             try: current_esg_report_date = date.fromisoformat(current_esg_report_date)
             except ValueError: current_esg_report_date = date.today()
-        info['last_esg_report'] = st.date_input("Last ESG Report Published", value=current_esg_report_date)
+        info['last_esg_report'] = st.date_input("Last ESG Report Published", value=current_esg_report_date, key="last_esg_report_date")
 
         current_training_date = info.get('last_training_date', date.today())
         if isinstance(current_training_date, str):
             try: current_training_date = date.fromisoformat(current_training_date)
             except ValueError: current_training_date = date.today()
-        info['last_training_date'] = st.date_input("Last ESG Training Conducted", value=current_training_date)
+        info['last_training_date'] = st.date_input("Last ESG Training Conducted", value=current_training_date, key="last_training_date")
 
 
         st.markdown("---")
@@ -351,7 +422,6 @@ elif st.session_state.page == "review":
     st.caption("VerdeBot is almost ready! Please take a moment to review your provided information. Accuracy here ensures the highest quality ESG analysis.")
     st.markdown("---")
 
-
     st.markdown("<h3 class='section-title'>✔️ Your Self-Assessment Responses</h3>", unsafe_allow_html=True)
     for pillar in ["Environmental", "Social", "Governance"]:
         st.subheader(f"Pillar: {pillar}")
@@ -366,6 +436,7 @@ elif st.session_state.page == "review":
 
     if st.button("Generate My ESG Score & Roadmap ✨"):
         st.session_state.page = "results"
+        st.session_state.results_generated = True # Set the flag to true
         st.rerun()
     st.info("💡 This review step is crucial for data validation, allowing users to correct inputs before the AI generates its final output, enhancing trust and accuracy in the AI's recommendations.")
 
@@ -573,4 +644,3 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                 st.error("❌ Error decoding VerdeBot's response. The API might have returned an invalid JSON.")
             except Exception as e:
                 st.error(f"❌ An unexpected error occurred while generating the roadmap: {e}")
-
