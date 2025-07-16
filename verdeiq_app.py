@@ -1,4 +1,4 @@
-# --- Enhanced VerdeIQ ESG Assessment App with Agentic AI Persona and Refined UI/UX ---
+# --- Enhanced VerdeIQ ESG Assessment App with Agentic AI Persona and UI/UX ---
 import streamlit as st
 import json
 import requests
@@ -35,16 +35,13 @@ st.markdown("""
             border: 1px solid #ddd;
             background-color: #f9f9f9;
             transition: all 0.15s ease-in-out;
-            cursor: pointer; /* Indicate clickable */
         }
         .stRadio div[role="radiogroup"] label:hover {
             background-color: #eee;
         }
-        /* Style for selected radio button - Streamlit uses a specific class */
-        .stRadio div[role="radiogroup"] label.st-dg { 
+        .stRadio div[role="radiogroup"] label.st-dg { /* selected radio button */
             background-color: #D4EDDA !important;
             border-color: #28a745 !important;
-            color: #1a5e2a !important; /* Darker text for selected */
         }
         .feedback-box {
             background-color: #E6F3F0;
@@ -55,11 +52,9 @@ st.markdown("""
             font-style: italic;
             color: #2C3E50;
         }
-        /* Badge styling for score tiers */
-        .badge-red {color: #E74C3C; font-weight: bold; background-color: #FADBD8; padding: 5px 10px; border-radius: 5px; display: inline-block;}
-        .badge-yellow {color: #F39C12; font-weight: bold; background-color: #FCF3CF; padding: 5px 10px; border-radius: 5px; display: inline-block;}
-        .badge-green {color: #28B463; font-weight: bold; background-color: #D4EDDA; padding: 5px 10px; border-radius: 5px; display: inline-block;}
-        .stAlert { margin-bottom: 20px; }
+        .badge-red {color: #E74C3C; font-weight: bold; background-color: #FADBD8; padding: 5px 10px; border-radius: 5px;}
+        .badge-yellow {color: #F39C12; font-weight: bold; background-color: #FCF3CF; padding: 5px 10px; border-radius: 5px;}
+        .badge-green {color: #28B463; font-weight: bold; background-color: #D4EDDA; padding: 5px 10px; border-radius: 5px;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -78,7 +73,6 @@ questions = load_questions()
 
 # --- Split by Pillar ---
 def categorize_questions(questions_list):
-    """Categorizes questions into Environmental, Social, and Governance pillars."""
     env = [q for q in questions_list if q['pillar'] == 'Environmental']
     soc = [q for q in questions_list if q['pillar'] == 'Social']
     gov = [q for q in questions_list if q['pillar'] == 'Governance']
@@ -87,7 +81,7 @@ def categorize_questions(questions_list):
 env_questions, soc_questions, gov_questions = categorize_questions(questions)
 
 # --- Industry Weights for Scoring (Agentic Adaptation) ---
-# VerdeBot adjusts score weights based on industry relevance to provide context-aware insights.
+# VerdeBot adjusts score weights based on industry relevance.
 industry_weights = {
     "Manufacturing": {"Environmental": 1.5, "Social": 1.0, "Governance": 1.0},
     "IT/Services": {"Environmental": 1.0, "Social": 1.2, "Governance": 1.2},
@@ -126,18 +120,14 @@ with st.sidebar:
     st.progress(progress_percentage / 100, text=f"Progress: {int(progress_percentage)}%")
     st.markdown("---")
     for i, p in enumerate(pages):
-        # Disable navigation to future pages until current one is filled (optional but good for guided flow)
-        # For simplicity, allowing back navigation but keeping forward linear for now.
         if p == st.session_state.page:
             st.markdown(f"**➤ {titles[p]}**")
-        elif i < st.session_state.current_page_index: # Allow navigating back
+        else:
             if st.button(titles[p], key=f"sidebar_btn_{p}"):
                 st.session_state.page = p
                 st.rerun()
-        else: # Future pages
-            st.button(titles[p], key=f"sidebar_btn_{p}", disabled=True)
     st.markdown("---")
-    st.info("💡 **AI Product Management Tip:** A clear progress bar and sequential navigation guides the user, reducing abandonment and ensuring necessary data collection before AI processing.")
+    st.info("💡 **AI Product Management Tip:** Navigation updates in real-time, offering seamless user flow and immediate feedback on progress.")
 
 # --- Helper Functions ---
 def show_question_block(q, idx, total):
@@ -148,8 +138,11 @@ def show_question_block(q, idx, total):
     
     # Pre-select the existing response if available
     current_response_index = 0
-    if q['id'] in st.session_state.responses and st.session_state.responses[q['id']] in q['options']:
-        current_response_index = q['options'].index(st.session_state.responses[q['id']])
+    if q['id'] in st.session_state.responses:
+        try:
+            current_response_index = q['options'].index(st.session_state.responses[q['id']])
+        except ValueError:
+            current_response_index = 0 # Fallback if response not in current options (shouldn't happen with fixed options)
 
     st.session_state.responses[q['id']] = st.radio(
         label=f"Your Current Stance ({idx + 1} of {total})",
@@ -173,22 +166,22 @@ def calculate_scores(responses):
     total_possible_weighted_score = 0 # To calculate accurate overall percentage
 
     for q in questions:
-        if q["id"] in responses and responses[q["id"]] in q["options"]: # Only consider answered questions with valid options
+        if q["id"] in responses: # Only consider questions that have been answered
             score = q["options"].index(responses[q["id"]]) # 0 for first option, 1 for second, etc. (assuming 0-4 scale)
+            # Assuming max score for any option is len(options) - 1. For your questions, it seems to be 4 (0-4 scale).
             max_option_score = len(q["options"]) - 1 
 
-            weighted_score = score * weights.get(q["pillar"], 1.0) # Use .get with default 1.0 for safety
+            weighted_score = score * weights[q["pillar"]]
             total_weighted_score += weighted_score
-            
             pillar_scores[q["pillar"]] += weighted_score
-            pillar_weighted_counts[q["pillar"]] += weights.get(q["pillar"], 1.0)
-            total_possible_weighted_score += max_option_score * weights.get(q["pillar"], 1.0)
+            pillar_weighted_counts[q["pillar"]] += weights[q["pillar"]]
+            total_possible_weighted_score += max_option_score * weights[q["pillar"]]
 
     verde_score = 0
     if total_possible_weighted_score > 0:
         verde_score = round((total_weighted_score / total_possible_weighted_score) * 100)
     
-    # Calculate average score per pillar, normalized to a 0-5 scale (max score per question)
+    # Calculate average score per pillar, normalized to a 0-5 scale
     normalized_pillar_values = {
         pillar: (score / count) if count > 0 else 0
         for pillar, score, count in zip(pillar_scores.keys(), pillar_scores.values(), pillar_weighted_counts.values())
@@ -202,11 +195,12 @@ if st.session_state.page == "intro":
     st.subheader("Your Agentic ESG Copilot")
     st.caption("Crafted by Hemaang Patkar")
     
-
+    st.image("https://images.unsplash.com/photo-1542831371-29b0f74f9713?fit=crop&w=800&q=80", caption="ESG Intelligence powered by AI", use_column_width=True)
+    st.markdown("---")
 
     st.markdown("""
     **VerdeIQ** simulates the behavior of a real-world ESG consultant. It doesn't just score; it **analyzes**, **advises**, and **adapts** based on your company's unique profile.
-
+    
     Here’s what makes VerdeIQ truly agentic:
     * 🤖 **Agentic Persona (VerdeBot):** Our AI interprets your inputs, understanding nuances to provide relevant insights.
     * 🔎 **Framework Alignment:** Your responses are mapped against global ESG frameworks like GRI, SASB, BRSR, and UN SDGs, ensuring robust and credible analysis.
@@ -241,75 +235,41 @@ elif st.session_state.page == "details":
             info['name'] = st.text_input("Company Name", value=info.get('name', ''))
             info['industry'] = st.text_input("Industry", value=info.get('industry', ''))
             info['location'] = st.text_input("City", value=info.get('location', ''))
-            
-            # Ensure index is correctly set for selectbox
-            supply_chain_options = ["Local", "Regional", "Global"]
-            info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", supply_chain_options, index=supply_chain_options.index(info.get('supply_chain_exposure', "Local")))
-            
-            carbon_disclosure_options = ["Yes", "No"]
-            info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", carbon_disclosure_options, index=carbon_disclosure_options.index(info.get('carbon_disclosure', "No")))
-            
-            third_party_options = ["Yes", "No", "Planned"]
-            info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", third_party_options, index=third_party_options.index(info.get('third_party_audits', "No")))
-            
-            stakeholder_options = ["Yes", "No"]
-            info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", stakeholder_options, index=stakeholder_options.index(info.get('stakeholder_reporting', "No")))
-            
-            materiality_options = ["Yes", "No", "In Progress"]
-            info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", materiality_options, index=materiality_options.index(info.get('materiality_assessment_status', "No")))
-            
-            board_esg_options = ["Yes", "No"]
-            info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", board_esg_options, index=board_esg_options.index(info.get('board_esg_committee', "No")))
+            info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", ["Local", "Regional", "Global"], index=["Local", "Regional", "Global"].index(info.get('supply_chain_exposure', "Local")))
+            info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", ["Yes", "No"], index=["Yes", "No"].index(info.get('carbon_disclosure', "No")))
+            info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", ["Yes", "No", "Planned"], index=["Yes", "No", "Planned"].index(info.get('third_party_audits', "No")))
+            info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", ["Yes", "No"], index=["Yes", "No"].index(info.get('stakeholder_reporting', "No")))
+            info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", ["Yes", "No", "In Progress"], index=["Yes", "No", "In Progress"].index(info.get('materiality_assessment_status', "No")))
+            info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", ["Yes", "No"], index=["Yes", "No"].index(info.get('board_esg_committee', "No")))
         with c2:
-            team_size_options = ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"]
-            info['size'] = st.selectbox("Team Size", team_size_options, index=team_size_options.index(info.get('size', "1-10")))
-            
-            esg_goals_options = ["Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"]
-            info['esg_goals'] = st.multiselect("Core ESG Intentions", esg_goals_options, default=info.get('esg_goals', []))
-            
-            public_status_options = ["Yes", "No", "Planning to"]
-            info['public_status'] = st.radio("Listed Status", public_status_options, index=public_status_options.index(info.get('public_status', "No")))
-            
-            sector_type_options = list(industry_weights.keys())
-            info['sector_type'] = st.radio("Sector Type", sector_type_options, index=sector_type_options.index(info.get('sector_type', "Other")))
-            
-            esg_team_size_options = ["0", "1-2", "3-5", "6-10", "10+"]
-            info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", esg_team_size_options, index=esg_team_size_options.index(info.get('esg_team_size', "0")))
-            
-            internal_training_options = ["Yes", "No"]
-            info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", internal_training_options, index=internal_training_options.index(info.get('internal_esg_training', "No")))
-            
-            climate_risk_options = ["Yes", "No"]
-            info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", climate_risk_options, index=climate_risk_options.index(info.get('climate_risk_policy', "No")))
-            
-            regulatory_exposure_options = ["Low", "Moderate", "High"]
-            info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", regulatory_exposure_options, index=regulatory_exposure_options.index(info.get('regulatory_exposure', "Low")))
+            info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"], index=["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"].index(info.get('size', "1-10")))
+            info['esg_goals'] = st.multiselect("Core ESG Intentions", ["Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"], default=info.get('esg_goals', []))
+            info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"], index=["Yes", "No", "Planning to"].index(info.get('public_status', "No")))
+            info['sector_type'] = st.radio("Sector Type", list(industry_weights.keys()), index=list(industry_weights.keys()).index(info.get('sector_type', "Other")))
+            info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", ["0", "1-2", "3-5", "6-10", "10+"], index=["0", "1-2", "3-5", "6-10", "10+"].index(info.get('esg_team_size', "0")))
+            info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", ["Yes", "No"], index=["Yes", "No"].index(info.get('internal_esg_training', "No")))
+            info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", ["Yes", "No"], index=["Yes", "No"].index(info.get('climate_risk_policy', "No")))
+            info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", ["Low", "Moderate", "High"], index=["Low", "Moderate", "High"].index(info.get('regulatory_exposure', "Low")))
 
-        region_options = ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"]
-        info['region'] = st.selectbox("Main Operational Region", region_options, index=region_options.index(info.get('region', "North America")))
-        
+        info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"], index=["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"].index(info.get('region', "North America")))
         info['years_operating'] = st.slider("Years Since Founding", 0, 200, info.get('years_operating', 5))
         
         # Handle date inputs, ensuring they are `date` objects for value
-        # Convert stored string dates to date objects for proper display
-        current_esg_report_date = info.get('last_esg_report', date.today())
-        if isinstance(current_esg_report_date, str):
-            try: current_esg_report_date = date.fromisoformat(current_esg_report_date)
-            except ValueError: current_esg_report_date = date.today()
-        info['last_esg_report'] = st.date_input("Last ESG Report Published", value=current_esg_report_date)
-
-        current_training_date = info.get('last_training_date', date.today())
-        if isinstance(current_training_date, str):
-            try: current_training_date = date.fromisoformat(current_training_date)
-            except ValueError: current_training_date = date.today()
-        info['last_training_date'] = st.date_input("Last ESG Training Conducted", value=current_training_date)
-
+        if 'last_esg_report' in info and isinstance(info['last_esg_report'], str):
+            try: info['last_esg_report'] = date.fromisoformat(info['last_esg_report'])
+            except ValueError: info['last_esg_report'] = date.today()
+        if 'last_training_date' in info and isinstance(info['last_training_date'], str):
+            try: info['last_training_date'] = date.fromisoformat(info['last_training_date'])
+            except ValueError: info['last_training_date'] = date.today()
+        
+        info['last_esg_report'] = st.date_input("Last ESG Report Published", value=info.get('last_esg_report', date.today()))
+        info['last_training_date'] = st.date_input("Last ESG Training Conducted", value=info.get('last_training_date', date.today()))
 
         st.markdown("---")
         if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
             st.rerun()
-    st.info("💡 **AI Product Management Note:** This detailed profile allows VerdeBot to tailor its advice, enhancing the relevance and actionable nature of the generated roadmap. Comprehensive data collection at this stage is key for a truly 'agentic' experience.")
+    st.info("💡 **AI Product Management Insight:** This detailed profile allows VerdeBot to tailor its advice, enhancing the relevance and actionable nature of the generated roadmap.")
 
 elif st.session_state.page == "env":
     st.header("🌿 Environmental Evaluation")
@@ -321,7 +281,7 @@ elif st.session_state.page == "env":
         if st.form_submit_button("Continue to Social 🤝"):
             st.session_state.page = "soc"
             st.rerun()
-    st.info("💡 **AI Product Management Note:** Each question's consistent format simplifies data entry, and responses are immediately stored in session state, forming the knowledge base for VerdeBot's deep analysis.")
+    st.info("💡 **AI Product Management Insight:** Each question's format is consistent for ease of use, and your responses are immediately stored in session state for VerdeBot's future processing.")
 
 elif st.session_state.page == "soc":
     st.header("🤝 Social Assessment")
@@ -333,19 +293,19 @@ elif st.session_state.page == "soc":
         if st.form_submit_button("Continue to Governance 🏛️"):
             st.session_state.page = "gov"
             st.rerun()
-    st.info("💡 **AI Product Management Note:** The multi-page flow ensures a structured data collection process, preventing user fatigue and maintaining data integrity for the AI model's comprehensive understanding.")
+    st.info("💡 **AI Product Management Insight:** The multi-page flow ensures a structured data collection process, preventing user fatigue and maintaining data integrity for the AI model.")
 
 elif st.session_state.page == "gov":
     st.header("🏛️ Governance Assessment")
-    st.caption("VerdeBot is parsing leadership ethics, board oversight, transparency, and compliance structures. This is crucial for evaluating long-term resilience and accountability.")
+    st.caption("VerdeBot is parsing your leadership ethics, board oversight, transparency, and compliance structures. This is crucial for evaluating long-term resilience and accountability.")
     with st.form("gov_form"):
         for i, q in enumerate(gov_questions):
             show_question_block(q, i, len(gov_questions))
         st.markdown("---")
-        if st.form_submit_button("Review My Answers 🔍"): # Button to go to review page
-            st.session_state.page = "review"
+        if st.form_submit_button("Generate Agentic Summary ✨"):
+            st.session_state.page = "review" # Changed to review page first
             st.rerun()
-    st.info("💡 **AI Product Management Note:** Each pillar's assessment contributes to a holistic view, enabling VerdeBot to generate balanced and comprehensive ESG strategies, demonstrating the power of structured data for AI.")
+    st.info("💡 **AI Product Management Insight:** Each pillar's assessment contributes to a holistic view, enabling VerdeBot to generate balanced and comprehensive ESG strategies.")
 
 elif st.session_state.page == "review":
     st.title("🔍 Final Review: Confirm Your Inputs")
@@ -358,19 +318,18 @@ elif st.session_state.page == "review":
     st.markdown("<h3 class='section-title'>✔️ Your Self-Assessment Responses</h3>", unsafe_allow_html=True)
     for pillar in ["Environmental", "Social", "Governance"]:
         st.subheader(f"Pillar: {pillar}")
-        # Fixed NameError by correctly iterating over questions and checking existence in responses
-        for q_item in [q_data for q_data in questions if q_data["pillar"] == pillar]:
-            st.markdown(f"**{q_item['id']}: {q_item['question']}**")
+        for q in [q_item for q_item in questions if q_item["pillar"] == pillar]:
             if q_item['id'] in st.session_state.responses:
+                st.markdown(f"**{q_item['id']}: {q_item['question']}**")
                 st.write(f"   **Your Answer:** {st.session_state.responses[q_item['id']]}")
             else:
-                st.write(f"   **Your Answer:** _Not answered_") # Fallback for unanswered questions
+                st.markdown(f"**{q_item['id']}: {q_item['question']}** - _No answer provided_")
         st.markdown("---")
 
     if st.button("Generate My ESG Score & Roadmap ✨"):
         st.session_state.page = "results"
         st.rerun()
-    st.info("💡 **AI Product Management Note:** This review step is crucial for data validation, allowing users to correct inputs before the AI generates its final output, enhancing trust and accuracy in the AI's recommendations.")
+    st.info("💡 **AI Product Management Insight:** This review step is crucial for data validation, allowing users to correct inputs before the AI generates its final output, enhancing trust and accuracy.")
 
 elif st.session_state.page == "results":
     st.title("📊 VerdeIQ Agentic ESG Summary")
@@ -425,8 +384,8 @@ elif st.session_state.page == "results":
         showlegend=False,
         height=400 # Adjust chart height
     )
-    st.plotly_chart(fig, use_container_width=True) # Changed to use_container_width
-    
+    st.plotly_chart(fig, use_container_width=True)
+    st.info("💡 **AI Product Management Insight:** The radar chart provides an intuitive visual summary, allowing quick comprehension of pillar strengths and weaknesses, a key feature for decision-makers.")
     st.markdown("---")
 
     # --- Agentic Recommendation Generator ---
@@ -453,14 +412,13 @@ Thank you for your patience as VerdeBot formulates boardroom-ready recommendatio
                 info = st.session_state.company_info
                 responses = st.session_state.responses
                 
-                # Format detailed answers for the prompt, ensuring no extra asterisks
+                # Format detailed answers for the prompt
                 detailed_answers = ""
                 for q_item in questions:
                     if q_item['id'] in responses:
-                        # Cleaned output: removed extra asterisks around answers
-                        detailed_answers += f"- {q_item['id']}: {q_item['question']} -> {responses[q_item['id']]}\n" 
+                        detailed_answers += f"- {q_item['id']}: {q_item['question']} **->** {responses[q_item['id']]}\n"
                     else:
-                        detailed_answers += f"- {q_item['id']}: {q_item['question']} -> Not answered\n"
+                        detailed_answers += f"- {q_item['id']}: {q_item['question']} **->** _Not answered_\n"
 
 
                 # Construct the prompt for the LLM
@@ -531,7 +489,7 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
 
 **4. Key Tools & Metrics for Implementation**
    - Suggest 3-5 practical tools, templates, and documents that the company can use immediately to advance their ESG journey, aligned with their current maturity.
-   - Examples: CDP reporting portal, SASB Materiality Map, DEI dashboard template, ESG risk register. Explain _why_ each tool is relevant.
+   - Examples: CDP reporting portal, SASB Materiality Map, DEI dashboard template, ESG risk register, internal training modules. Explain _why_ each tool is relevant.
 
 **5. 90-Day Tactical Advisory Plan**
    - List 4–5 specific, tactical, and confidence-building actions that the company can execute within the next three months to kickstart or significantly advance their ESG efforts. These should be highly actionable.
@@ -555,8 +513,7 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                     recs = output.get("text") or output.get("message") # Cohere can return 'text' or 'message'
                     if recs:
                         st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
-                        # Display roadmap with cleaned formatting (remove extra bolding if any)
-                        st.markdown(recs.replace("**->**", "->")) 
+                        st.markdown(recs)
                         
                         st.download_button(
                             label="⬇️ Download Roadmap as Text",
@@ -576,4 +533,4 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                 st.error("❌ Error decoding VerdeBot's response. The API might have returned an invalid JSON.")
             except Exception as e:
                 st.error(f"❌ An unexpected error occurred while generating the roadmap: {e}")
-
+        st.info("💡 **AI Product Management Insight:** The multi-stage generation process with clear user feedback (spinner text) manages expectations and communicates the complexity of the AI's task.")
