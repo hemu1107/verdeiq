@@ -1,19 +1,3 @@
-The `tokenize.TokenError` usually indicates a syntax issue in the Python code itself, especially when `inspect.getsource(func)` is trying to read the source code of a function. In your provided traceback, the error points to the line:
-
-```python
-File "/mount/src/verdeiq/verdeiq_app.py", line 20, in <module>
-    </style>
-```
-
-This suggests that there might be some stray, unparsed HTML or a malformed string within your Python file, specifically around line 20. Looking at your provided code, the `<style>` tag is part of a multi-line string passed to `st.markdown` for styling. The error message `TokenError: ('', (1, 1))` implies an issue at the very beginning of a tokenization process, often caused by unexpected characters.
-
-The likely culprit is the **indentation of the HTML string within `st.markdown`**. Python's `inspect.getsource()` can sometimes struggle with dynamically generated or incorrectly indented multi-line strings, especially within Streamlit's caching mechanism (`@st.cache_data`). Even though the HTML itself is within a string, incorrect indentation can sometimes confuse the tokenizer when it tries to determine the source code of the function.
-
-To resolve this, I'll ensure the HTML string for styling is correctly and consistently indented, typically left-aligned within the `st.markdown` call, or at least consistently indented without leading whitespace on new lines within the string literal itself.
-
-Here's the rectified code:
-
-```python
 # --- Enhanced VerdeIQ ESG Assessment App (with Feedback Enhancements) ---
 import streamlit as st
 import json
@@ -364,4 +348,3 @@ Deliver a structured and deeply tailored ESG Advisory Report. Structure it with 
                     st.warning("⚠️ Cohere API key not found in Streamlit secrets.")
             except Exception as e:
                 st.error(f"❌ Error generating roadmap: {e}")
-```
