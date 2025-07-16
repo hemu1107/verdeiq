@@ -1,22 +1,53 @@
-# --- Enhanced VerdeIQ ESG Assessment App with Agentic AI Persona ---
+# --- Enhanced VerdeIQ ESG Assessment App (with Feedback Enhancements) ---
 import streamlit as st
 import json
 import requests
 import plotly.graph_objects as go
 from pathlib import Path
+from datetime import date
 
 # --- Configuration ---
 st.set_page_config(page_title="VerdeIQ | ESG Intelligence", layout="centered", page_icon="🌿")
 
-# --- Styling & Theming ---
+# --- Styling ---
 st.markdown("""
     <style>
         .title-style {font-size: 32px; font-weight: bold; color: #228B22;}
         .section-title {font-size: 20px; font-weight: 600; margin-top: 20px;}
+        .badge-green {color: green; font-weight: bold;}
+        .badge-yellow {color: orange; font-weight: bold;}
+        .badge-red {color: red; font-weight: bold;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- Load ESG Questions JSON ---
+# --- Sidebar Navigation ---
+pages = ["intro", "details", "env", "soc", "gov", "review", "results"]
+titles = {
+    "intro": "🌱 Welcome",
+    "details": "🏢 Company Info",
+    "env": "🌿 Environmental",
+    "soc": "🤝 Social",
+    "gov": "🏛️ Governance",
+    "review": "🔍 Review",
+    "results": "📊 Results"
+}
+
+if "page" not in st.session_state:
+    st.session_state.page = "intro"
+    st.session_state.responses = {}
+    st.session_state.company_info = {}
+
+with st.sidebar:
+    st.markdown("## 🧭 Navigation")
+    for p in pages:
+        if p == st.session_state.page:
+            st.markdown(f"**➤ {titles[p]}**")
+        elif p in pages[:pages.index(st.session_state.page)]:  # Allow back navigation
+            if st.button(titles[p]):
+                st.session_state.page = p
+                st.rerun()
+
+# --- Load Questions ---
 @st.cache_data
 def load_questions():
     file_path = Path("esg_questions.json")
@@ -28,7 +59,6 @@ def load_questions():
 
 questions = load_questions()
 
-# --- Split by Pillar ---
 def categorize_questions(questions):
     env = [q for q in questions if q['pillar'] == 'Environmental']
     soc = [q for q in questions if q['pillar'] == 'Social']
@@ -37,18 +67,14 @@ def categorize_questions(questions):
 
 env_questions, soc_questions, gov_questions = categorize_questions(questions)
 
-# --- Session Management ---
-if "page" not in st.session_state:
-    st.session_state.page = "intro"
-    st.session_state.responses = {}
-    st.session_state.company_info = {}
+industry_weights = {
+    "Manufacturing": {"Environmental": 1.5, "Social": 1.0, "Governance": 1.0},
+    "IT/Services": {"Environmental": 1.0, "Social": 1.2, "Governance": 1.2},
+    "Finance": {"Environmental": 0.8, "Social": 1.0, "Governance": 1.5},
+    "Healthcare": {"Environmental": 1.2, "Social": 1.2, "Governance": 1.0},
+    "Other": {"Environmental": 1.0, "Social": 1.0, "Governance": 1.0}
+}
 
-# --- Agentic Copilot Introduction ---
-def introduce_agent():
-    st.info("🤖 Meet VerdeBot: Your ESG Copilot")
-    st.caption("VerdeBot will guide you through the ESG assessment journey, adaptively interpreting your inputs to generate strategic insights aligned with global standards.")
-
-# --- Helper Functions ---
 def show_question_block(q, idx, total):
     st.markdown(f"**{q['id']}: {q['question']}**")
     if q.get('frameworks'):
@@ -62,17 +88,21 @@ def show_question_block(q, idx, total):
     st.markdown("---")
 
 def calculate_scores(responses):
+    sector = st.session_state.company_info.get("sector_type", "Other")
+    weights = industry_weights.get(sector, {"Environmental": 1.0, "Social": 1.0, "Governance": 1.0})
+
     pillar_scores = {"Environmental": 0, "Social": 0, "Governance": 0}
     pillar_counts = {"Environmental": 0, "Social": 0, "Governance": 0}
     total_score = 0
 
     for q in questions:
         score = q["options"].index(responses[q["id"]])
-        total_score += score
-        pillar_scores[q["pillar"]] += score
-        pillar_counts[q["pillar"]] += 1
+        weighted_score = score * weights[q["pillar"]]
+        total_score += weighted_score
+        pillar_scores[q["pillar"]] += weighted_score
+        pillar_counts[q["pillar"]] += weights[q["pillar"]]
 
-    verde_score = round((total_score / (5 * len(questions))) * 100)
+    verde_score = round((total_score / (5 * sum(pillar_counts.values()))) * 100)
     return verde_score, pillar_scores, pillar_counts
 
 # --- Pages ---
@@ -80,65 +110,47 @@ if st.session_state.page == "intro":
     st.markdown("<div class='title-style'>Welcome to VerdeIQ 🌿</div>", unsafe_allow_html=True)
     st.subheader("Your Agentic ESG Copilot")
     st.caption("Crafted by Hemaang Patkar")
-    introduce_agent()
-    st.markdown("""
-    VerdeIQ simulates the behavior of a real-world ESG consultant — not just scoring, but analyzing, advising, and adapting.
-
-    - 🤖 Agentic Persona: VerdeBot interprets your responses
-    - 🔎 15 ESG-aligned prompts mapped to global frameworks
-    - 📊 Real-time contextual scoring and advisory
-    - 🛍️ Roadmaps curated to your company’s size, maturity, and sector
-
-    **Maturity Tiers:**
-    - 🌱 Seedling (0–29)
-    - 🌿 Sprout (30–49)
-    - 🍃 Developing (50–69)
-    - 🌳 Mature (70–89)
-    - ✨ Leader (90–100)
-    """)
+    st.markdown("""VerdeIQ simulates the behavior of a real-world ESG consultant — not just scoring, but analyzing, advising, and adapting.""")
     if st.button("Launch ESG Copilot →"):
         st.session_state.page = "details"
         st.rerun()
 
 elif st.session_state.page == "details":
     st.title("🏢 Agentic Profile Setup")
-    st.caption("VerdeBot is learning your company DNA...")
     with st.form("org_form"):
         c1, c2 = st.columns(2)
         with c1:
-            st.session_state.company_info['name'] = st.text_input("Company Name")
-            st.session_state.company_info['industry'] = st.text_input("Industry")
-            st.session_state.company_info['location'] = st.text_input("City")
-            st.session_state.company_info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", ["Local", "Regional", "Global"])
-            st.session_state.company_info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", ["Yes", "No"])
-            st.session_state.company_info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", ["Yes", "No", "Planned"])
-            st.session_state.company_info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", ["Yes", "No"])
-            st.session_state.company_info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", ["Yes", "No", "In Progress"])
-            st.session_state.company_info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", ["Yes", "No"])
+            info = st.session_state.company_info
+            info['name'] = st.text_input("Company Name")
+            info['industry'] = st.text_input("Industry")
+            info['location'] = st.text_input("City")
+            info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", ["Local", "Regional", "Global"])
+            info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", ["Yes", "No"])
+            info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", ["Yes", "No", "Planned"])
+            info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", ["Yes", "No"])
+            info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", ["Yes", "No", "In Progress"])
+            info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", ["Yes", "No"])
         with c2:
-            st.session_state.company_info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"])
-            st.session_state.company_info['esg_goals'] = st.multiselect("Core ESG Intentions", [
-                "Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
-            st.session_state.company_info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"])
-            st.session_state.company_info['sector_type'] = st.radio("Sector Type", ["Manufacturing", "IT/Services", "Finance", "Healthcare", "Other"])
-            st.session_state.company_info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", ["0", "1-2", "3-5", "6-10", "10+"])
-            st.session_state.company_info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", ["Yes", "No"])
-            st.session_state.company_info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", ["Yes", "No"])
-            st.session_state.company_info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", ["Low", "Moderate", "High"])
+            info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"])
+            info['esg_goals'] = st.multiselect("Core ESG Intentions", ["Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
+            info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"])
+            info['sector_type'] = st.radio("Sector Type", list(industry_weights.keys()))
+            info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", ["0", "1-2", "3-5", "6-10", "10+"])
+            info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", ["Yes", "No"])
+            info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", ["Yes", "No"])
+            info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", ["Low", "Moderate", "High"])
 
-        st.session_state.company_info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
-        st.session_state.company_info['years_operating'] = st.slider("Years Since Founding", 0, 200, 5)
+        info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
+        info['years_operating'] = st.slider("Years Since Founding", 0, 200, 5)
+        info['last_esg_report'] = st.date_input("Last ESG Report Published", value=date.today())
+        info['last_training_date'] = st.date_input("Last ESG Training Conducted", value=date.today())
 
         if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
             st.rerun()
 
-# (Remaining code continues unchanged)
-
-
 elif st.session_state.page == "env":
     st.header("🌿 Environmental Evaluation")
-    st.caption("VerdeBot is interpreting your sustainability posture...")
     with st.form("env_form"):
         for i, q in enumerate(env_questions):
             show_question_block(q, i, len(env_questions))
@@ -148,7 +160,6 @@ elif st.session_state.page == "env":
 
 elif st.session_state.page == "soc":
     st.header("🤝 Social Assessment")
-    st.caption("Analyzing your team, culture, and external impact...")
     with st.form("soc_form"):
         for i, q in enumerate(soc_questions):
             show_question_block(q, i, len(soc_questions))
@@ -158,13 +169,23 @@ elif st.session_state.page == "soc":
 
 elif st.session_state.page == "gov":
     st.header("🏛️ Governance Assessment")
-    st.caption("Parsing leadership ethics and oversight structures...")
     with st.form("gov_form"):
         for i, q in enumerate(gov_questions):
             show_question_block(q, i, len(gov_questions))
-        if st.form_submit_button("Generate Agentic Summary ✨"):
-            st.session_state.page = "results"
+        if st.form_submit_button("Review My Answers 🔍"):
+            st.session_state.page = "review"
             st.rerun()
+
+elif st.session_state.page == "review":
+    st.title("🔍 Final Review")
+    st.markdown("Please review your answers before proceeding.")
+    for pillar in ["Environmental", "Social", "Governance"]:
+        st.subheader(pillar)
+        for q in [q for q in questions if q["pillar"] == pillar]:
+            st.markdown(f"**{q['id']}**: {st.session_state.responses[q['id']]}")
+    if st.button("Generate My ESG Score ✨"):
+        st.session_state.page = "results"
+        st.rerun()
 
 elif st.session_state.page == "results":
     st.title("📊 VerdeIQ Agentic ESG Summary")
@@ -172,21 +193,23 @@ elif st.session_state.page == "results":
     labels = list(scores.keys())
     values = [scores[k] / counts[k] if counts[k] else 0 for k in labels]
 
-    badge = "🌱 Seedling" if verde_score < 30 else \
-            "🌿 Sprout" if verde_score < 50 else \
-            "🍃 Developing" if verde_score < 70 else \
-            "🌳 Mature" if verde_score < 90 else "✨ Leader"
+    badge, badge_class = (
+        ("🌱 Seedling", "badge-red") if verde_score < 30 else
+        ("🌿 Sprout", "badge-yellow") if verde_score < 50 else
+        ("🍃 Developing", "badge-yellow") if verde_score < 70 else
+        ("🌳 Mature", "badge-green") if verde_score < 90 else
+        ("✨ Leader", "badge-green")
+    )
 
     st.metric(label="Your ESG Copilot Score", value=f"{verde_score}/100")
-    st.success(f"Agentic Tier: {badge}")
+    st.markdown(f"<div class='{badge_class}'>Agentic Tier: {badge}</div>", unsafe_allow_html=True)
+    st.caption("VerdeBot interprets your ESG behavior across the three strategic pillars:")
 
-    st.caption("VerdeBot interprets your ESG behavior across the three strategic pillars. Here's your performance radar:")
     fig = go.Figure(data=go.Scatterpolar(r=values, theta=labels, fill='toself'))
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Agentic Recommendation Generator ---
-    if st.button("🔍 Generate My ESG Analysis & Roadmap (via VerdeBot)"):
+        if st.button("🔍 Generate My ESG Analysis & Roadmap (via VerdeBot)"):
         with st.spinner("""
 🔍 Initiating Agentic ESG Reasoning...
 
@@ -197,13 +220,14 @@ VerdeBot — your Agentic ESG Copilot — is now:
 • Synthesizing a customized roadmap tuned to your sector, scale, and ESG ambitions  
 
 ⏳ This may take **up to a minute** depending on your ESG profile depth.  
-Thank you for your patience as VerdeBot formulates boardroom-ready recommendations!
 """):
             try:
                 info = st.session_state.company_info
                 responses = st.session_state.responses
                 detailed_answers = "\n".join([f"- {qid}: {responses[qid]}" for qid in responses])
-                prompt = f"""You are VerdeBot, an advanced Agentic ESG Copilot and strategic advisor with deep expertise in global sustainability practices, regulatory alignment, and corporate governance. Your role is to act as a senior ESG consultant tasked with translating the following company’s ESG posture into a precise, framework-aligned, and context-aware roadmap.
+
+                prompt = f"""
+You are VerdeBot, an advanced Agentic ESG Copilot and strategic advisor with deep expertise in global sustainability practices, regulatory alignment, and corporate governance. Your role is to act as a senior ESG consultant tasked with translating the following company’s ESG posture into a precise, framework-aligned, and context-aware roadmap.
 
 Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending technical sustainability metrics with industry-specific insights. Ensure your output is:
 - Aligned with frameworks such as GRI, SASB, BRSR, and UN SDGs.
@@ -221,9 +245,9 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
 - Public Status: {info.get('public_status')}
 - Region: {info.get('region')}
 - Years in Operation: {info.get('years_operating')}
-- Main City: {info.get('location')}
-- Operational Reach: {info.get('supply_chain_exposure')}
-- Regulatory Risk Level: {info.get('regulatory_exposure')}
+- City: {info.get('location')}
+- Supply Chain Exposure: {info.get('supply_chain_exposure')}
+- Regulatory Risk: {info.get('regulatory_exposure')}
 - Core ESG Intentions: {', '.join(info.get('esg_goals', [])) or 'Not specified'}
 
 📄 **Governance & Policy Indicators**
@@ -234,13 +258,15 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
 - Carbon Disclosure: {info.get('carbon_disclosure')}
 - Third-Party ESG Audits: {info.get('third_party_audits')}
 - Stakeholder Reporting: {info.get('stakeholder_reporting')}
+- Last ESG Report: {info.get('last_esg_report')}
+- Last Training Date: {info.get('last_training_date')}
 
 📊 **Assessment Results**
 - VerdeIQ Score: {verde_score}/100
-- Badge: {badge}
-- Environmental Maturity: {values[0]:.2f}/5
-- Social Maturity: {values[1]:.2f}/5
-- Governance Maturity: {values[2]:.2f}/5
+- Tier: {badge}
+- Environmental Score: {values[0]:.2f}/5
+- Social Score: {values[1]:.2f}/5
+- Governance Score: {values[2]:.2f}/5
 
 🧠 **Self-Assessment Snapshot**
 {detailed_answers}
@@ -289,11 +315,18 @@ Deliver a structured and deeply tailored ESG Advisory Report. Structure it with 
                         json={"model": "command-r-plus", "message": prompt}
                     )
                     output = response.json()
-                    recs = output.get("text") or output.get("response") or "No response received."
-                    st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
-                    st.markdown(recs)
-                else:
-                    st.warning("⚠️ Cohere API key not found. Please add it to your secrets config.")
+                    roadmap = output.get("text") or output.get("response") or "No roadmap received."
 
+                    st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
+                    st.markdown(roadmap)
+
+                    st.download_button(
+                        label="⬇️ Download Roadmap as Text",
+                        data=roadmap,
+                        file_name="VerdeIQ_ESG_Roadmap.txt",
+                        mime="text/plain"
+                    )
+                else:
+                    st.warning("⚠️ Cohere API key not found in Streamlit secrets.")
             except Exception as e:
                 st.error(f"❌ Error generating roadmap: {e}")
