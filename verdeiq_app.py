@@ -37,19 +37,16 @@ def load_questions(sector_type=None):
             "Healthcare": ["Health Care"],
             "Other": ["Infrastructure", "Consumer Goods"]
         }
-        # Map sector_type to SASB sectors (simplified for demo)
         applicable_sectors = sector_mapping.get(sector_type, ["Infrastructure"])
         filtered_questions = []
         for q in questions:
-            # Check if question applies to the sector (based on SASB metadata)
             if not q.get("sasb_sectors") or any(s in applicable_sectors for s in q.get("sasb_sectors", [])):
-                # Apply weighting for industry-specific materiality (e.g., emissions higher for Manufacturing)
                 if sector_type == "Manufacturing" and "emissions" in q["question"].lower():
-                    q["weight"] = q.get("weight", 1) * 1.5  # Higher weight for emissions in Manufacturing
+                    q["weight"] = q.get("weight", 1) * 1.5
                 elif sector_type == "IT/Services" and "emissions" in q["question"].lower():
-                    q["weight"] = q.get("weight", 1) * 0.8  # Lower weight for emissions in IT/Services
+                    q["weight"] = q.get("weight", 1) * 0.8
                 else:
-                    q["weight"] = q.get("weight", 1)  # Default weight
+                    q["weight"] = q.get("weight", 1)
                 filtered_questions.append(q)
         return filtered_questions
     return questions
@@ -60,6 +57,12 @@ def categorize_questions(questions):
     soc = [q for q in questions if q['pillar'] == 'Social']
     gov = [q for q in questions if q['pillar'] == 'Governance']
     return env, soc, gov
+
+# --- Initialize Questions in Session State ---
+if "questions" not in st.session_state:
+    # Load default questions (no sector_type initially)
+    st.session_state.questions = load_questions()
+    st.session_state.env_questions, st.session_state.soc_questions, st.session_state.gov_questions = categorize_questions(st.session_state.questions)
 
 # --- Session Management ---
 if "page" not in st.session_state:
@@ -79,11 +82,10 @@ def show_question_block(q, idx, total):
     st.markdown(f"**{q['id']}: {q['question']}**")
     if q.get('frameworks'):
         st.caption(f"Frameworks: {', '.join(q['frameworks'])} | SASB Sectors: {', '.join(q.get('sasb_sectors', ['All']))}")
-    # Add time sensitivity dimension
     if "policy" in q["question"].lower() or "report" in q["question"].lower() or "training" in q["question"].lower():
         st.session_state.responses[f"{q['id']}_last_updated"] = st.date_input(
             f"Last Updated/Reviewed for {q['id']}",
-            value=None,
+            value=st.session_state.responses.get(f"{q['id']}_last_updated"),
             min_value=datetime.date(2000, 1, 1),
             max_value=datetime.date.today(),
             key=f"{q['id']}_last_updated"
@@ -92,7 +94,7 @@ def show_question_block(q, idx, total):
         label=f"Agentic Analysis {idx + 1} of {total}",
         options=q['options'],
         index=0 if q['id'] not in st.session_state.responses else q['options'].index(st.session_state.responses[q['id']]),
-        key=f"{q['id']}_response"
+        key=f"{q['id']}_response_{uuid.uuid4()}"  # Unique key to prevent conflicts
     )
     st.markdown("---")
 
@@ -106,7 +108,7 @@ def calculate_scores(responses, questions):
         if q["id"] in responses:
             score = q["options"].index(responses[q["id"]]) * q.get("weight", 1)
             total_score += score
-            max_score += 5 * q.get("weight", 1)  # Max score per question is 5
+            max_score += 5 * q.get("weight", 1)
             pillar_scores[q["pillar"]] += score
             pillar_counts[q["pillar"]] += 1
 
@@ -117,7 +119,9 @@ def calculate_scores(responses, questions):
 def show_review_page():
     st.header("📋 Review Your Responses")
     st.caption("Review and edit your responses before final submission.")
-    for pillar, q_list in [("Environmental", env_questions), ("Social", soc_questions), ("Governance", gov_questions)]:
+    for pillar, q_list in [("Environmental", st.session_state.env_questions), 
+                         ("Social", st.session_state.soc_questions), 
+                         ("Governance", st.session_state.gov_questions)]:
         st.subheader(f"{pillar} Responses")
         for q in q_list:
             st.markdown(f"**{q['id']}: {q['question']}**")
@@ -207,18 +211,19 @@ elif st.session_state.page == "details":
         st.session_state.company_info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
         st.session_state.company_info['years_operating'] = st.slider("Years Since Founding", 0, 200, 5)
 
-        add_navigation_buttons("details", None, "env", "org_form")
-
-    # Load questions based on sector type
-    questions = load_questions(st.session_state.company_info.get('sector_type'))
-    env_questions, soc_questions, gov_questions = categorize_questions(questions)
+        if st.form_submit_button("Activate ESG Analysis →"):
+            # Update questions based on sector_type
+            st.session_state.questions = load_questions(st.session_state.company_info.get('sector_type'))
+            st.session_state.env_questions, st.session_state.soc_questions, st.session_state.gov_questions = categorize_questions(st.session_state.questions)
+            st.session_state.page = "env"
+            st.rerun()
 
 elif st.session_state.page == "env":
     st.header("🌿 Environmental Evaluation")
     st.caption("VerdeBot is interpreting your sustainability posture...")
     with st.form("env_form"):
-        for i, q in enumerate(env_questions):
-            show_question_block(q, i, len(env_questions))
+        for i, q in enumerate(st.session_state.env_questions):
+            show_question_block(q, i, len(st.session_state.env_questions))
         if st.button("Review Responses", key="env_review"):
             st.session_state.previous_page = "env"
             st.session_state.review_mode = True
@@ -230,8 +235,8 @@ elif st.session_state.page == "soc":
     st.header("🤝 Social Assessment")
     st.caption("Analyzing your team, culture, and external impact...")
     with st.form("soc_form"):
-        for i, q in enumerate(soc_questions):
-            show_question_block(q, i, len(soc_questions))
+        for i, q in enumerate(st.session_state.soc_questions):
+            show_question_block(q, i, len(st.session_state.soc_questions))
         if st.button("Review Responses", key="soc_review"):
             st.session_state.previous_page = "soc"
             st.session_state.review_mode = True
@@ -243,8 +248,8 @@ elif st.session_state.page == "gov":
     st.header("🏛️ Governance Assessment")
     st.caption("Parsing leadership ethics and oversight structures...")
     with st.form("gov_form"):
-        for i, q in enumerate(gov_questions):
-            show_question_block(q, i, len(gov_questions))
+        for i, q in enumerate(st.session_state.gov_questions):
+            show_question_block(q, i, len(st.session_state.gov_questions))
         if st.button("Review Responses", key="gov_review"):
             st.session_state.previous_page = "gov"
             st.session_state.review_mode = True
@@ -257,7 +262,7 @@ elif st.session_state.page == "review":
 
 elif st.session_state.page == "results":
     st.title("📊 VerdeIQ Agentic ESG Summary")
-    verde_score, scores, counts = calculate_scores(st.session_state.responses, questions)
+    verde_score, scores, counts = calculate_scores(st.session_state.responses, st.session_state.questions)
     labels = list(scores.keys())
     values = [scores[k] / counts[k] if counts[k] else 0 for k in labels]
 
