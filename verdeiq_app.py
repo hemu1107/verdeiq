@@ -60,7 +60,6 @@ def categorize_questions(questions):
 
 # --- Initialize Questions in Session State ---
 if "questions" not in st.session_state:
-    # Load default questions (no sector_type initially)
     st.session_state.questions = load_questions()
     st.session_state.env_questions, st.session_state.soc_questions, st.session_state.gov_questions = categorize_questions(st.session_state.questions)
 
@@ -94,7 +93,7 @@ def show_question_block(q, idx, total):
         label=f"Agentic Analysis {idx + 1} of {total}",
         options=q['options'],
         index=0 if q['id'] not in st.session_state.responses else q['options'].index(st.session_state.responses[q['id']]),
-        key=f"{q['id']}_response_{uuid.uuid4()}"  # Unique key to prevent conflicts
+        key=f"{q['id']}_response_{uuid.uuid4()}"
     )
     st.markdown("---")
 
@@ -212,7 +211,6 @@ elif st.session_state.page == "details":
         st.session_state.company_info['years_operating'] = st.slider("Years Since Founding", 0, 200, 5)
 
         if st.form_submit_button("Activate ESG Analysis →"):
-            # Update questions based on sector_type
             st.session_state.questions = load_questions(st.session_state.company_info.get('sector_type'))
             st.session_state.env_questions, st.session_state.soc_questions, st.session_state.gov_questions = categorize_questions(st.session_state.questions)
             st.session_state.page = "env"
@@ -224,11 +222,13 @@ elif st.session_state.page == "env":
     with st.form("env_form"):
         for i, q in enumerate(st.session_state.env_questions):
             show_question_block(q, i, len(st.session_state.env_questions))
-        if st.button("Review Responses", key="env_review"):
-            st.session_state.previous_page = "env"
-            st.session_state.review_mode = True
-            st.session_state.page = "review"
-            st.rerun()
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.form_submit_button("Review Responses", key="env_review"):
+                st.session_state.previous_page = "env"
+                st.session_state.review_mode = True
+                st.session_state.page = "review"
+                st.rerun()
         add_navigation_buttons("env", "details", "soc", "env_form")
 
 elif st.session_state.page == "soc":
@@ -237,11 +237,13 @@ elif st.session_state.page == "soc":
     with st.form("soc_form"):
         for i, q in enumerate(st.session_state.soc_questions):
             show_question_block(q, i, len(st.session_state.soc_questions))
-        if st.button("Review Responses", key="soc_review"):
-            st.session_state.previous_page = "soc"
-            st.session_state.review_mode = True
-            st.session_state.page = "review"
-            st.rerun()
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.form_submit_button("Review Responses", key="soc_review"):
+                st.session_state.previous_page = "soc"
+                st.session_state.review_mode = True
+                st.session_state.page = "review"
+                st.rerun()
         add_navigation_buttons("soc", "env", "gov", "soc_form")
 
 elif st.session_state.page == "gov":
@@ -250,11 +252,13 @@ elif st.session_state.page == "gov":
     with st.form("gov_form"):
         for i, q in enumerate(st.session_state.gov_questions):
             show_question_block(q, i, len(st.session_state.gov_questions))
-        if st.button("Review Responses", key="gov_review"):
-            st.session_state.previous_page = "gov"
-            st.session_state.review_mode = True
-            st.session_state.page = "review"
-            st.rerun()
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.form_submit_button("Review Responses", key="gov_review"):
+                st.session_state.previous_page = "gov"
+                st.session_state.review_mode = True
+                st.session_state.page = "review"
+                st.rerun()
         add_navigation_buttons("gov", "soc", "results", "gov_form")
 
 elif st.session_state.page == "review":
