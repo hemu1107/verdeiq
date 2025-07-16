@@ -1,0 +1,21 @@
+# .streamlit/config.toml
+
+# Theme Configuration for VerdeIQ ESG App
+[theme]
+# Base theme: "light" or "dark". "light" provides a clean, bright interface.
+base = "light"
+# Primary brand color, used for buttons, accents, and important elements.
+primaryColor = "#28B463" # A vibrant, earthy green, aligning with 'Verde' (green) and sustainability.
+# Primary background color of the app.
+backgroundColor = "#F0F2F6" # Light grey, provides a subtle contrast to elements.
+# Secondary background color for elements like sidebars and selected components.
+secondaryBackgroundColor = "#FFFFFF" # Pure white for clean content sections.
+# Text color for general UI elements.
+textColor = "#2C3E50" # Dark slate grey for good readability.
+# Font family for the app. 'sans serif' is a good default for clarity and modern feel.
+font = "sans serif"
+
+# Browser Configuration
+[browser]
+# Whether to gather anonymous usage statistics. Set to false for privacy or production environments.
+gatherUsageStats = false
