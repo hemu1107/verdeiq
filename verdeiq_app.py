@@ -137,8 +137,7 @@ with st.sidebar:
         else: # Future pages
             st.button(titles[p], key=f"sidebar_btn_{p}", disabled=True)
     st.markdown("---")
-    st.info("💡 **AI Product Management Tip:** A clear progress bar and sequential navigation guides the user, reducing abandonment and ensuring necessary data collection before AI processing.")
-
+    
 # --- Helper Functions ---
 def show_question_block(q, idx, total):
     """Displays a single ESG question with its options and captures the user's response."""
