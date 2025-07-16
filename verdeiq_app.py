@@ -202,9 +202,7 @@ if st.session_state.page == "intro":
     st.subheader("Your Agentic ESG Copilot")
     st.caption("Crafted by Hemaang Patkar")
     
-    # Updated use_column_width to use_container_width
-    st.image("https://images.unsplash.com/photo-1542831371-29b0f74f9713?fit=crop&w=800&q=80", caption="ESG Intelligence powered by AI", use_container_width=True)
-    st.markdown("---")
+
 
     st.markdown("""
     **VerdeIQ** simulates the behavior of a real-world ESG consultant. It doesn't just score; it **analyzes**, **advises**, and **adapts** based on your company's unique profile.
