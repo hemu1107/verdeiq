@@ -579,35 +579,3 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
             except Exception as e:
                 st.error(f"❌ An unexpected error occurred while generating the roadmap: {e}")
 
-# --- AI Product Management General Insights (for developers/product managers) ---
-# These comments are for the product manager/developer reviewing the code, not for the end-user UI.
-"""
-## AI Product Management Insights for VerdeIQ:
-
-1.  **User Onboarding & Expectations:** The "intro" page is crucial for setting expectations about VerdeBot's "agentic" capabilities. Clearly defining terms like "Agentic Copilot" and "Maturity Tiers" helps users understand the value proposition. The use of a progress bar throughout the app visually reinforces the journey and manages user commitment.
-
-2.  **Data Collection for AI:**
-    * The "Company Info" section is designed for comprehensive initial data capture. This rich, structured data is fundamental for the AI (VerdeBot) to generate highly personalized and context-aware recommendations. The more granular the input, the better the AI's output quality.
-    * Using Streamlit's `st.session_state` to persist inputs across pages is vital. This prevents data loss and ensures a seamless user experience, which is paramount for any AI-powered application requiring multi-step input.
-
-3.  **Feedback Loops & Trust:**
-    * The "Review" page is a critical feedback loop. It allows users to verify their inputs before the AI processes them. This increases user trust in the AI's output, as they can confirm the foundation of the analysis is accurate.
-    * The spinner messages during AI processing are important for managing user expectations, especially for tasks that take time (like LLM calls). They explain *what* the AI is doing, making the process transparent and reducing perceived latency.
-
-4.  **AI Explainability & Transparency (to an extent):**
-    * While not full explainability, the "Framework Alignment" captions in question blocks hint at how the AI is processing information, giving users a glimpse into the AI's reasoning.
-    * The breakdown of "Pillar-Wise Performance" and the radar chart visualize the AI's scoring, making the assessment less of a black box and more understandable.
-
-5.  **Actionable Output Design:** The roadmap's structured format (Immediate, Mid-Term, Long-Term, Pillar-Wise, Tools, 90-Day Plan) is designed for immediate actionability. An AI product's success often hinges on how easily its outputs can be translated into real-world steps.
-    * The download button for the roadmap ensures users can take the AI's advice offline, integrating it into their workflows.
-
-6.  **Scalability & Maintainability:**
-    * Caching `load_questions` with `@st.cache_data` is a good practice for performance.
-    * Centralizing `industry_weights` and `categorize_questions` makes the scoring logic modular and easier to update.
-    * Using `st.secrets.get("cohere_api_key")` is essential for secure API key management in a Streamlit Cloud environment.
-
-7.  **Iterative Improvement (Product Roadmap):**
-    * Consider adding a feature for users to provide feedback on the *quality* of the generated roadmap. This feedback loop can be invaluable for refining the AI's prompt or fine-tuning the model in future iterations.
-    * Explore more dynamic visualizations or interactive elements for the roadmap itself to enhance engagement.
-    * Could there be a "Compare to Peers" feature based on aggregated anonymized data?
-"""
