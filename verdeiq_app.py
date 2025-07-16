@@ -350,9 +350,7 @@ elif st.session_state.page == "review":
     st.title("🔍 Final Review: Confirm Your Inputs")
     st.caption("VerdeBot is almost ready! Please take a moment to review your provided information. Accuracy here ensures the highest quality ESG analysis.")
     st.markdown("---")
-    st.markdown("<h3 class='section-title'>🏢 Company Profile Snapshot</h3>", unsafe_allow_html=True)
-    info = st.session_state.company_info
-    st.json(info) # Display company info cleanly
+
 
     st.markdown("<h3 class='section-title'>✔️ Your Self-Assessment Responses</h3>", unsafe_allow_html=True)
     for pillar in ["Environmental", "Social", "Governance"]:
