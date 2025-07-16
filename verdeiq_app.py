@@ -1,3 +1,19 @@
+The `tokenize.TokenError` usually indicates a syntax issue in the Python code itself, especially when `inspect.getsource(func)` is trying to read the source code of a function. In your provided traceback, the error points to the line:
+
+```python
+File "/mount/src/verdeiq/verdeiq_app.py", line 20, in <module>
+    </style>
+```
+
+This suggests that there might be some stray, unparsed HTML or a malformed string within your Python file, specifically around line 20. Looking at your provided code, the `<style>` tag is part of a multi-line string passed to `st.markdown` for styling. The error message `TokenError: ('', (1, 1))` implies an issue at the very beginning of a tokenization process, often caused by unexpected characters.
+
+The likely culprit is the **indentation of the HTML string within `st.markdown`**. Python's `inspect.getsource()` can sometimes struggle with dynamically generated or incorrectly indented multi-line strings, especially within Streamlit's caching mechanism (`@st.cache_data`). Even though the HTML itself is within a string, incorrect indentation can sometimes confuse the tokenizer when it tries to determine the source code of the function.
+
+To resolve this, I'll ensure the HTML string for styling is correctly and consistently indented, typically left-aligned within the `st.markdown` call, or at least consistently indented without leading whitespace on new lines within the string literal itself.
+
+Here's the rectified code:
+
+```python
 # --- Enhanced VerdeIQ ESG Assessment App (with Feedback Enhancements) ---
 import streamlit as st
 import json
@@ -102,7 +118,8 @@ def calculate_scores(responses):
         pillar_scores[q["pillar"]] += weighted_score
         pillar_counts[q["pillar"]] += weights[q["pillar"]]
 
-    verde_score = round((total_score / (5 * sum(pillar_counts.values()))) * 100)
+    # Prevent division by zero if a pillar has no questions
+    verde_score = round((total_score / (5 * sum(pillar_counts.values()))) * 100) if sum(pillar_counts.values()) else 0
     return verde_score, pillar_scores, pillar_counts
 
 # --- Pages ---
@@ -121,29 +138,40 @@ elif st.session_state.page == "details":
         c1, c2 = st.columns(2)
         with c1:
             info = st.session_state.company_info
-            info['name'] = st.text_input("Company Name")
-            info['industry'] = st.text_input("Industry")
-            info['location'] = st.text_input("City")
-            info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", ["Local", "Regional", "Global"])
-            info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", ["Yes", "No"])
-            info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", ["Yes", "No", "Planned"])
-            info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", ["Yes", "No"])
-            info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", ["Yes", "No", "In Progress"])
-            info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", ["Yes", "No"])
+            info['name'] = st.text_input("Company Name", value=info.get('name', ''))
+            info['industry'] = st.text_input("Industry", value=info.get('industry', ''))
+            info['location'] = st.text_input("City", value=info.get('location', ''))
+            info['supply_chain_exposure'] = st.selectbox("Supply Chain Exposure", ["Local", "Regional", "Global"], index=["Local", "Regional", "Global"].index(info.get('supply_chain_exposure', "Local")))
+            info['carbon_disclosure'] = st.radio("Discloses Carbon Emissions?", ["Yes", "No"], index=["Yes", "No"].index(info.get('carbon_disclosure', "No")))
+            info['third_party_audits'] = st.radio("Undergoes 3rd-Party ESG Audits?", ["Yes", "No", "Planned"], index=["Yes", "No", "Planned"].index(info.get('third_party_audits', "No")))
+            info['stakeholder_reporting'] = st.radio("Publishes Stakeholder Reports?", ["Yes", "No"], index=["Yes", "No"].index(info.get('stakeholder_reporting', "No")))
+            info['materiality_assessment_status'] = st.radio("Materiality Assessment Conducted?", ["Yes", "No", "In Progress"], index=["Yes", "No", "In Progress"].index(info.get('materiality_assessment_status', "No")))
+            info['board_esg_committee'] = st.radio("Board-Level ESG Committee?", ["Yes", "No"], index=["Yes", "No"].index(info.get('board_esg_committee', "No")))
         with c2:
-            info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"])
-            info['esg_goals'] = st.multiselect("Core ESG Intentions", ["Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"])
-            info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"])
-            info['sector_type'] = st.radio("Sector Type", list(industry_weights.keys()))
-            info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", ["0", "1-2", "3-5", "6-10", "10+"])
-            info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", ["Yes", "No"])
-            info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", ["Yes", "No"])
-            info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", ["Low", "Moderate", "High"])
+            info['size'] = st.selectbox("Team Size", ["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"], index=["1-10", "11-50", "51-200", "201-500", "500-1000", "1000+"].index(info.get('size', "1-10")))
+            info['esg_goals'] = st.multiselect("Core ESG Intentions", ["Carbon Neutrality", "DEI", "Data Privacy", "Green Reporting", "Compliance", "Community Engagement"], default=info.get('esg_goals', []))
+            info['public_status'] = st.radio("Listed Status", ["Yes", "No", "Planning to"], index=["Yes", "No", "Planning to"].index(info.get('public_status', "No")))
+            info['sector_type'] = st.radio("Sector Type", list(industry_weights.keys()), index=list(industry_weights.keys()).index(info.get('sector_type', "Other")))
+            info['esg_team_size'] = st.selectbox("Dedicated ESG Team Size", ["0", "1-2", "3-5", "6-10", "10+"], index=["0", "1-2", "3-5", "6-10", "10+"].index(info.get('esg_team_size', "0")))
+            info['internal_esg_training'] = st.radio("Internal ESG Training Programs?", ["Yes", "No"], index=["Yes", "No"].index(info.get('internal_esg_training', "No")))
+            info['climate_risk_policy'] = st.radio("Climate Risk Mitigation Policy?", ["Yes", "No"], index=["Yes", "No"].index(info.get('climate_risk_policy', "No")))
+            info['regulatory_exposure'] = st.selectbox("Regulatory Exposure", ["Low", "Moderate", "High"], index=["Low", "Moderate", "High"].index(info.get('regulatory_exposure', "Low")))
 
-        info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"])
-        info['years_operating'] = st.slider("Years Since Founding", 0, 200, 5)
-        info['last_esg_report'] = st.date_input("Last ESG Report Published", value=date.today())
-        info['last_training_date'] = st.date_input("Last ESG Training Conducted", value=date.today())
+        info['region'] = st.selectbox("Main Operational Region", ["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"], index=["North America", "Europe", "Asia-Pacific", "Middle East", "Africa", "Global"].index(info.get('region', "North America")))
+        info['years_operating'] = st.slider("Years Since Founding", 0, 200, info.get('years_operating', 5))
+        # Ensure date inputs handle default value correctly (e.g., convert string to date if stored as string)
+        if 'last_esg_report' in info and isinstance(info['last_esg_report'], str):
+            try:
+                info['last_esg_report'] = date.fromisoformat(info['last_esg_report'])
+            except ValueError:
+                info['last_esg_report'] = date.today()
+        if 'last_training_date' in info and isinstance(info['last_training_date'], str):
+            try:
+                info['last_training_date'] = date.fromisoformat(info['last_training_date'])
+            except ValueError:
+                info['last_training_date'] = date.today()
+        info['last_esg_report'] = st.date_input("Last ESG Report Published", value=info.get('last_esg_report', date.today()))
+        info['last_training_date'] = st.date_input("Last ESG Training Conducted", value=info.get('last_training_date', date.today()))
 
         if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
@@ -182,7 +210,11 @@ elif st.session_state.page == "review":
     for pillar in ["Environmental", "Social", "Governance"]:
         st.subheader(pillar)
         for q in [q for q in questions if q["pillar"] == pillar]:
-            st.markdown(f"**{q['id']}**: {st.session_state.responses[q['id']]}")
+            # Ensure the key exists before accessing
+            if q['id'] in st.session_state.responses:
+                st.markdown(f"**{q['id']}**: {st.session_state.responses[q['id']]}")
+            else:
+                st.markdown(f"**{q['id']}**: Not answered") # Fallback for un-answered questions
     if st.button("Generate My ESG Score ✨"):
         st.session_state.page = "results"
         st.rerun()
@@ -209,7 +241,8 @@ elif st.session_state.page == "results":
     fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-        if st.button("🔍 Generate My ESG Analysis & Roadmap (via VerdeBot)"):
+    # Indentation correction for the button and spinner block
+    if st.button("🔍 Generate My ESG Analysis & Roadmap (via VerdeBot)"):
         with st.spinner("""
 🔍 Initiating Agentic ESG Reasoning...
 
@@ -278,25 +311,25 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
 Deliver a structured and deeply tailored ESG Advisory Report. Structure it with the following sections:
 
 1. **ESG Profile Summary**
-   - Showcase strengths across the 3 pillars based on maturity scores and profile fields.
-   - Identify 3–5 gaps considering disclosures, governance, training, and risk.
-   - Reference ESG frameworks like GRI 305, SASB Standards, BRSR Principle 3, SDG 12, etc.
+    - Showcase strengths across the 3 pillars based on maturity scores and profile fields.
+    - Identify 3–5 gaps considering disclosures, governance, training, and risk.
+    - Reference ESG frameworks like GRI 305, SASB Standards, BRSR Principle 3, SDG 12, etc.
 
 2. **Roadmap (0–36 Months)**
-   - **Immediate (0–6 months):** Internal capacity-building, audits, dashboards, materiality clarifications.
-   - **Mid-Term (6–18 months):** Stakeholder engagement, GRI-aligned reporting, risk-based action plans.
-   - **Long-Term (18–36 months):** Third-party disclosures, ESG ratings readiness, governance reform.
+    - **Immediate (0–6 months):** Internal capacity-building, audits, dashboards, materiality clarifications.
+    - **Mid-Term (6–18 months):** Stakeholder engagement, GRI-aligned reporting, risk-based action plans.
+    - **Long-Term (18–36 months):** Third-party disclosures, ESG ratings readiness, governance reform.
 
 3. **Pillar-Wise Breakdown**
-   - 2–3 recommendations per pillar.
-   - Tie each point to global ESG frameworks and relevant tools.
+    - 2–3 recommendations per pillar.
+    - Tie each point to global ESG frameworks and relevant tools.
 
 4. **Tools & Metrics**
-   - Suggest tools, templates, and documents to use immediately (aligned to company maturity).
-   - E.g., CDP portal, SASB Navigator, DEI dashboards, ESG risk register.
+    - Suggest tools, templates, and documents to use immediately (aligned to company maturity).
+    - E.g., CDP portal, SASB Navigator, DEI dashboards, ESG risk register.
 
 5. **90-Day Advisory Plan**
-   - List 4–5 tactical, confidence-building actions.
+    - List 4–5 tactical, confidence-building actions.
 
 ---
 
@@ -315,7 +348,8 @@ Deliver a structured and deeply tailored ESG Advisory Report. Structure it with 
                         json={"model": "command-r-plus", "message": prompt}
                     )
                     output = response.json()
-                    roadmap = output.get("text") or output.get("response") or "No roadmap received."
+                    # Cohere API might return "text" or "message" in the response depending on version/endpoint
+                    roadmap = output.get("text") or output.get("message") or "No roadmap received."
 
                     st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
                     st.markdown(roadmap)
@@ -330,3 +364,4 @@ Deliver a structured and deeply tailored ESG Advisory Report. Structure it with 
                     st.warning("⚠️ Cohere API key not found in Streamlit secrets.")
             except Exception as e:
                 st.error(f"❌ Error generating roadmap: {e}")
+```
