@@ -149,7 +149,7 @@ progress_percentage = (st.session_state.current_page_index / (total_pages - 1)) 
 with st.sidebar:
     # --- LOGO INTEGRATION IN SIDEBAR using URL ---
     # Adjusted width for sidebar to fit nicely.
-    st.image(LOGO_URL, width=70) # Slightly smaller width for sidebar
+    st.image(LOGO_URL, width=120) # Slightly smaller width for sidebar
     st.markdown("---") # Separator below the logo
 
     st.markdown("## 🧭 Navigation")
@@ -234,7 +234,7 @@ if st.session_state.page == "intro":
     # Using use_container_width=True for better responsiveness.
     col1, col2, col3 = st.columns([1, 2, 1]) # Columns for centering
     with col2:
-    
+        st.image(LOGO_URL, use_container_width=True) # Replaced use_column_width with use_container_width
     
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
     st.subheader("Your Agentic ESG Copilot")
