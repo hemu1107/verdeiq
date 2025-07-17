@@ -79,11 +79,28 @@ st.markdown("""
             background-color: #f2f2f2;
             font-weight: bold;
         }
-        /* Center image for intro page */
-        .stImage {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 25px; /* Add some space below the logo */
+        
+        /* Custom CSS for logo sizing and centering */
+        .main-logo {
+            display: block; /* Ensures it takes up its own line */
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 250px; /* Max width for the intro page logo */
+            width: 100%; /* Ensures responsiveness within max-width */
+            padding-top: 20px; /* Space above logo */
+            padding-bottom: 20px; /* Space below logo */
+        }
+        /* Adjust sidebar image for better padding/alignment */
+        .css-1d3f8as.e1fqkh3o1 { /* This is a common Streamlit class for the sidebar content area */
+            padding-top: 1rem; /* Adjust as needed */
+            padding-left: 1rem; /* Adjust as needed */
+            padding-right: 1rem; /* Adjust as needed */
+        }
+        .sidebar-logo-container img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 10px; /* Space below sidebar logo */
         }
     </style>
 """, unsafe_allow_html=True)
@@ -152,9 +169,11 @@ total_pages = len(pages)
 progress_percentage = (st.session_state.current_page_index / (total_pages - 1)) * 100 if total_pages > 1 else 0
 
 with st.sidebar:
-    # --- LOGO INTEGRATION IN SIDEBAR using URL (smaller size) ---
-    # Reduced width for a less distracting presence.
+    # --- LOGO INTEGRATION IN SIDEBAR using URL (smaller size and centered via CSS) ---
+    # Wrap in a div to apply custom CSS for centering and padding
+    st.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
     st.image(LOGO_URL, width=80) # Adjusted width for sidebar (e.g., 80px)
+    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown("---") # Separator below the logo
 
     st.markdown("## 🧭 Navigation")
@@ -235,9 +254,10 @@ def calculate_scores(responses):
 
 # --- Pages ---
 if st.session_state.page == "intro":
-    # --- LOGO INTEGRATION ON INTRO PAGE using URL (smaller size and centered) ---
-    # Removed st.columns and used `st.image(..., width=...)` directly with CSS for centering.
-    st.image(LOGO_URL, width=180) # Adjusted width for intro page (e.g., 180px)
+    # --- LOGO INTEGRATION ON INTRO PAGE using URL (smaller, centered via CSS) ---
+    # Removed st.columns and applied a custom CSS class for centering and max-width.
+    st.image(LOGO_URL, width=200, output_format="PNG") # Fixed width, output_format for consistency
+    st.markdown('<div class="main-logo"></div>', unsafe_allow_html=True) # Placeholder for CSS alignment
     
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
     st.subheader("Your Agentic ESG Copilot")
