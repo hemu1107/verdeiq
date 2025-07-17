@@ -10,6 +10,7 @@ from datetime import date # Import date for handling date inputs
 st.set_page_config(page_title="VerdeIQ | ESG Intelligence", layout="centered", page_icon="🌿")
 
 # --- Define the logo URL ---
+# This URL is directly used by st.image to fetch the logo from the web.
 LOGO_URL = "https://static.wixstatic.com/media/dc163e_321b2631dcf34be580eeff92e8a5fe33~mv2.png/v1/fill/w_608,h_608,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/dc163e_321b2631dcf34be580eeff92e8a5fe33~mv2.png"
 
 # --- Styling & Theming ---
@@ -147,6 +148,7 @@ progress_percentage = (st.session_state.current_page_index / (total_pages - 1)) 
 
 with st.sidebar:
     # --- LOGO INTEGRATION IN SIDEBAR using URL ---
+    # This line now correctly uses the LOGO_URL variable.
     st.image(LOGO_URL, width=150) # Adjust width as desired
     st.markdown("---") # Separator below the logo
 
@@ -229,6 +231,7 @@ def calculate_scores(responses):
 # --- Pages ---
 if st.session_state.page == "intro":
     # --- LOGO INTEGRATION ON INTRO PAGE using URL ---
+    # This line now correctly uses the LOGO_URL variable.
     col1, col2, col3 = st.columns([1, 2, 1]) # Columns for centering
     with col2:
         st.image(LOGO_URL, use_column_width=True) # Use the URL
