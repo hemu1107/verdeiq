@@ -60,6 +60,22 @@ st.markdown("""
         .badge-yellow {color: #F39C12; font-weight: bold; background-color: #FCF3CF; padding: 5px 10px; border-radius: 5px; display: inline-block;}
         .badge-green {color: #28B463; font-weight: bold; background-color: #D4EDDA; padding: 5px 10px; border-radius: 5px; display: inline-block;}
         .stAlert { margin-bottom: 20px; }
+        
+        /* Table styling for maturity tiers */
+        .maturity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .maturity-table th, .maturity-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .maturity-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -131,8 +147,6 @@ with st.sidebar:
     st.progress(progress_percentage / 100, text=f"Progress: {int(progress_percentage)}%")
     st.markdown("---")
     for i, p in enumerate(pages):
-        # Disable navigation to future pages until current one is filled (optional but good for guided flow)
-        # For simplicity, allowing back navigation but keeping forward linear for now.
         # Modified navigation logic: If results are generated, disable all navigation except the current page.
         is_disabled = (st.session_state.results_generated and p != st.session_state.page) or \
                       (i > st.session_state.current_page_index and not st.session_state.results_generated)
@@ -213,6 +227,8 @@ if st.session_state.page == "intro":
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
     st.subheader("Your Agentic ESG Copilot")
     st.caption("Crafted by Hemaang Patkar")
+    
+    st.info("💡 **Expected time to complete the assessment: ~10-15 minutes.**") # Added estimated time
     
     st.markdown("""
     **VerdeIQ** simulates the behavior of a real-world ESG consultant. It doesn't just score; it **analyzes**, **advises**, and **adapts** based on your company's unique profile.
@@ -495,6 +511,51 @@ elif st.session_state.page == "results":
     )
     st.plotly_chart(fig, use_container_width=True) # Changed to use_container_width
     
+    st.markdown("---")
+    
+    # --- Display all Maturity Tiers (New Enhancement) ---
+    st.markdown("<h3 class='section-title'>Understanding All ESG Maturity Tiers</h3>", unsafe_allow_html=True)
+    st.markdown("""
+    To help you benchmark and plan your growth, here are all the ESG maturity tiers:
+    """)
+    st.markdown("""
+    <table class="maturity-table">
+        <thead>
+            <tr>
+                <th>Tier</th>
+                <th>Score Range</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>🌱 Seedling</td>
+                <td>0–29</td>
+                <td>Early stages, foundational efforts recommended.</td>
+            </tr>
+            <tr>
+                <td>🌿 Sprout</td>
+                <td>30–49</td>
+                <td>Growing awareness, initial steps toward integration.</td>
+            </tr>
+            <tr>
+                <td>🍃 Developing</td>
+                <td>50–69</td>
+                <td>Established practices, room for strategic enhancements.</td>
+            </tr>
+            <tr>
+                <td>🌳 Mature</td>
+                <td>70–89</td>
+                <td>Robust ESG programs, ready for advanced reporting.</td>
+            </tr>
+            <tr>
+                <td>✨ Leader</td>
+                <td>90–100</td>
+                <td>Exemplary performance, setting industry benchmarks.</td>
+            </tr>
+        </tbody>
+    </table>
+    """, unsafe_allow_html=True)
     st.markdown("---")
 
     # --- Agentic Recommendation Generator ---
