@@ -143,10 +143,6 @@ total_pages = len(pages)
 progress_percentage = (st.session_state.current_page_index / (total_pages - 1)) * 100 if total_pages > 1 else 0
 
 with st.sidebar:
-    # --- LOGO INTEGRATION IN SIDEBAR ---
-    st.image("VerdeIQ ESG Intelligence Logo.jpg", width=150) # Adjust width as desired
-    st.markdown("---") # Separator below the logo
-
     st.markdown("## 🧭 Navigation")
     st.progress(progress_percentage / 100, text=f"Progress: {int(progress_percentage)}%")
     st.markdown("---")
@@ -171,12 +167,15 @@ def show_question_block(q, idx, total):
         st.caption(f"**Framework Alignment:** {', '.join(q['frameworks'])} _(VerdeBot considers these for detailed analysis)_")
     
     # Pre-select the existing response if available
+    # Ensure that current_response_index is valid, otherwise default to 0
     current_response_index = 0
     if q['id'] in st.session_state.responses and st.session_state.responses[q['id']] in q['options']:
         try:
             current_response_index = q['options'].index(st.session_state.responses[q['id']])
         except ValueError:
+            # If the stored response is no longer in options (e.g., questions changed), default to 0
             current_response_index = 0
+
 
     st.session_state.responses[q['id']] = st.radio(
         label=f"Your Current Stance ({idx + 1} of {total})",
@@ -225,16 +224,11 @@ def calculate_scores(responses):
 
 # --- Pages ---
 if st.session_state.page == "intro":
-    # --- LOGO INTEGRATION ON INTRO PAGE ---
-    col1, col2, col3 = st.columns([1, 2, 1]) # Columns for centering
-    with col2:
-        st.image("VerdeIQ ESG Intelligence Logo.jpg", use_column_width=True) # Adjust width or use_column_width
-    
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
     st.subheader("Your Agentic ESG Copilot")
     st.caption("Crafted by Hemaang Patkar")
     
-    st.info("💡 **Expected time to complete the assessment: ~10-15 minutes.**") # Estimated time
+    st.info("💡 **Expected time to complete the assessment: ~10-15 minutes.**") # Added estimated time
     
     st.markdown("""
     **VerdeIQ** simulates the behavior of a real-world ESG consultant. It doesn't just score; it **analyzes**, **advises**, and **adapts** based on your company's unique profile.
@@ -383,6 +377,7 @@ elif st.session_state.page == "details":
         info['years_operating'] = st.slider("Years Since Founding", 0, 200, info.get('years_operating', 5))
         
         # Handle date inputs, ensuring they are `date` objects for value
+        # Convert stored string dates to date objects for proper display
         current_esg_report_date = info.get('last_esg_report', date.today())
         if isinstance(current_esg_report_date, str):
             try: current_esg_report_date = date.fromisoformat(current_esg_report_date)
@@ -446,6 +441,7 @@ elif st.session_state.page == "review":
     st.markdown("<h3 class='section-title'>✔️ Your Self-Assessment Responses</h3>", unsafe_allow_html=True)
     for pillar in ["Environmental", "Social", "Governance"]:
         st.subheader(f"Pillar: {pillar}")
+        # Fixed NameError by correctly iterating over questions and checking existence in responses
         for q_item in [q_data for q_data in questions if q_data["pillar"] == pillar]:
             st.markdown(f"**{q_item['id']}: {q_item['question']}**")
             if q_item['id'] in st.session_state.responses:
@@ -513,11 +509,11 @@ elif st.session_state.page == "results":
         showlegend=False,
         height=400 # Adjust chart height
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True) # Changed to use_container_width
     
     st.markdown("---")
     
-    # --- Display all Maturity Tiers ---
+    # --- Display all Maturity Tiers (New Enhancement) ---
     st.markdown("<h3 class='section-title'>Understanding All ESG Maturity Tiers</h3>", unsafe_allow_html=True)
     st.markdown("""
     To help you benchmark and plan your growth, here are all the ESG maturity tiers:
@@ -586,10 +582,11 @@ Thank you for your patience as VerdeBot formulates boardroom-ready recommendatio
                 info = st.session_state.company_info
                 responses = st.session_state.responses
                 
-                # Format detailed answers for the prompt
+                # Format detailed answers for the prompt, ensuring no extra asterisks
                 detailed_answers = ""
                 for q_item in questions:
                     if q_item['id'] in responses:
+                        # Cleaned output: removed extra asterisks around answers
                         detailed_answers += f"- {q_item['id']}: {q_item['question']} -> {responses[q_item['id']]}\n" 
                     else:
                         detailed_answers += f"- {q_item['id']}: {q_item['question']} -> Not answered\n"
@@ -684,9 +681,10 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                         json={"model": "command-r-plus", "message": prompt}
                     )
                     output = response.json()
-                    recs = output.get("text") or output.get("message")
+                    recs = output.get("text") or output.get("message") # Cohere can return 'text' or 'message'
                     if recs:
                         st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
+                        # Display roadmap with cleaned formatting (remove extra bolding if any)
                         st.markdown(recs.replace("**->**", "->")) 
                         
                         st.download_button(
@@ -697,7 +695,7 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                         )
                     else:
                         st.error("VerdeBot did not return a roadmap. There might be an issue with the API response.")
-                        st.json(output)
+                        st.json(output) # Display full output for debugging
                 else:
                     st.warning("⚠️ **Cohere API key not found.** To generate the detailed ESG roadmap, please ensure your `cohere_api_key` is configured in Streamlit secrets.")
 
