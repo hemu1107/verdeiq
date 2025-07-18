@@ -403,7 +403,7 @@ elif st.session_state.page == "details":
         if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
             st.rerun()
-    st.info("💡 Detailed profiling enables VerdeBot to deliver tailored, actionable roadmaps for a truly agentic experience.")
+    st.info("💡 Profiling enables VerdeBot to deliver personalized, actionable roadmaps.")
 
 elif st.session_state.page == "env":
     st.header("🌿 Environmental Evaluation")
@@ -415,7 +415,7 @@ elif st.session_state.page == "env":
         if st.form_submit_button("Continue to Social 🤝"):
             st.session_state.page = "soc"
             st.rerun()
-    st.info("💡 A consistent question format streamlines input and builds VerdeBot’s session-based knowledge for deeper analysis.")
+    st.info("💡 Consistent questions streamline input and power deep analysis.")
 
 elif st.session_state.page == "soc":
     st.header("🤝 Social Assessment")
@@ -427,7 +427,7 @@ elif st.session_state.page == "soc":
         if st.form_submit_button("Continue to Governance 🏛️"):
             st.session_state.page = "gov"
             st.rerun()
-    st.info("💡 The multi-page flow structures data collection, reducing fatigue and ensuring integrity for deeper AI understanding.")
+    st.info("💡 Multi-page flow ensures clean, fatigue-free data collection.")
 
 elif st.session_state.page == "gov":
     st.header("🏛️ Governance Assessment")
@@ -439,7 +439,7 @@ elif st.session_state.page == "gov":
         if st.form_submit_button("Review My Answers 🔍"): # Button to go to review page
             st.session_state.page = "review"
             st.rerun()
-    st.info("💡 Each pillar’s assessment builds a holistic view, powering VerdeBot’s balanced ESG strategies through structured data for the AI model")
+    st.info("💡 Each pillar adds to a complete, strategy-ready ESG view.")
 
 elif st.session_state.page == "review":
     st.title("🔍 Final Review: Confirm Your Inputs")
@@ -461,7 +461,7 @@ elif st.session_state.page == "review":
         st.session_state.page = "results"
         st.session_state.results_generated = True # Set the flag to true
         st.rerun()
-    st.info("💡 The review step validates data, letting users correct inputs and boosting trust and accuracy in AI recommendations.")
+    st.info("💡 Reviewing ensures accurate input and trusted AI output.")
 
 elif st.session_state.page == "results":
     st.title("📊 VerdeIQ Agentic ESG Summary")
