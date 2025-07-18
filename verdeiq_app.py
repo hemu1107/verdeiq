@@ -10,6 +10,7 @@ from datetime import date # Import date for handling date inputs
 st.set_page_config(page_title="VerdeIQ | ESG Intelligence", layout="centered", page_icon="🌿")
 
 # --- Define the logo URL ---
+# This URL is directly used by st.image to fetch the logo from the web.
 LOGO_URL = "https://static.wixstatic.com/media/dc163e_321b2631dcf34be580eeff92e8a5fe33~mv2.png/v1/fill/w_608,h_608,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/dc163e_321b2631dcf34be580eeff92e8a5fe33~mv2.png"
 
 # --- Styling & Theming ---
@@ -79,37 +80,6 @@ st.markdown("""
             background-color: #f2f2f2;
             font-weight: bold;
         }
-        
-        /* Custom CSS for main page logo sizing and centering */
-        .main-logo-container {
-            display: flex; /* Use flexbox for centering */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically if needed (for varying heights) */
-            padding-top: 30px; /* More space above logo */
-            padding-bottom: 30px; /* More space below logo */
-        }
-        .main-logo-container img {
-            max-width: 200px; /* Reduced max-width for a more subtle look */
-            height: auto; /* Maintain aspect ratio */
-            display: block; /* Remove extra space below image */
-        }
-
-        /* Adjust sidebar logo and general sidebar padding */
-        .st-emotion-cache-1d3f8as { /* This is a more robust selector for sidebar content */
-            padding-top: 1.5rem; /* Increase top padding for sidebar content */
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        .sidebar-logo-container {
-            display: flex;
-            justify-content: center; /* Center logo in sidebar */
-            margin-bottom: 15px; /* Space below sidebar logo */
-            padding-top: 10px; /* Small padding at the top of the logo */
-        }
-        .sidebar-logo-container img {
-            max-width: 60px; /* Further reduced width for sidebar logo */
-            height: auto; /* Maintain aspect ratio */
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -177,11 +147,9 @@ total_pages = len(pages)
 progress_percentage = (st.session_state.current_page_index / (total_pages - 1)) * 100 if total_pages > 1 else 0
 
 with st.sidebar:
-    # --- LOGO INTEGRATION IN SIDEBAR using URL (smaller size and centered via CSS) ---
-    # Wrap in a div to apply custom CSS for centering and padding
-    st.markdown('<div class="sidebar-logo-container">', unsafe_allow_html=True)
-    st.image(LOGO_URL, width=60) # Further reduced width for sidebar (e.g., 60px)
-    st.markdown('</div>', unsafe_allow_html=True)
+    # --- LOGO INTEGRATION IN SIDEBAR using URL ---
+    # Adjusted width for sidebar to fit nicely.
+    st.image(LOGO_URL, width=120) # Slightly smaller width for sidebar
     st.markdown("---") # Separator below the logo
 
     st.markdown("## 🧭 Navigation")
@@ -262,11 +230,11 @@ def calculate_scores(responses):
 
 # --- Pages ---
 if st.session_state.page == "intro":
-    # --- LOGO INTEGRATION ON INTRO PAGE (smaller, centered via CSS) ---
-    # Wrapped st.image in a div with a custom class for better control over centering and spacing.
-    st.markdown('<div class="main-logo-container">', unsafe_allow_html=True)
-    st.image(LOGO_URL, width=200, output_format="PNG") # Optimized width for intro page
-    st.markdown('</div>', unsafe_allow_html=True)
+    # --- LOGO INTEGRATION ON INTRO PAGE using URL ---
+    # Using use_container_width=True for better responsiveness.
+    col1, col2, col3 = st.columns([1, 2, 1]) # Columns for centering
+    with col2:
+        st.image(LOGO_URL, use_container_width=True) # Replaced use_column_width with use_container_width
     
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
     st.subheader("Your Agentic ESG Copilot")
@@ -551,7 +519,7 @@ elif st.session_state.page == "results":
         showlegend=False,
         height=400 # Adjust chart height
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True) # Changed to use_container_width
     
     st.markdown("---")
     
@@ -615,8 +583,7 @@ elif st.session_state.page == "results":
 * **Parsing Organizational Inputs:** Analyzing your company profile, self-assessment responses, and implied maturity across strategy, disclosure, governance, and operations.
 * **Aligning with Global ESG Frameworks:** Cross-referencing your data with leading frameworks (GRI, SASB, BRSR, UN SDGs) to ensure globally recognized relevance.
 * **Inferring Maturity Signals:** Detecting subtle cues in your responses to gauge your current ESG maturity, compliance posture, and strategic readiness.
-* **Synthesizing Customized Roadmap:**
-Crafting a step-by-step, actionable roadmap uniquely tuned to your sector, scale, and specific ESG ambitions.
+* **Synthesizing Customized Roadmap:** Crafting a step-by-step, actionable roadmap uniquely tuned to your sector, scale, and specific ESG ambitions.
 
 ⏳ This intricate analysis may take **up to a minute** depending on the depth of your ESG profile.
 Thank you for your patience as VerdeBot formulates boardroom-ready recommendations!
