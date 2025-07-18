@@ -45,7 +45,7 @@ st.markdown("""
             background-color: #eee;
         }
         /* Style for selected radio button - Streamlit uses a specific class */
-        .stRadio div[role="radiogroup"] label.st-dg {
+        .stRadio div[role="radiogroup"] label.st-dg { 
             background-color: #D4EDDA !important;
             border-color: #28a745 !important;
             color: #1a5e2a !important; /* Darker text for selected */
@@ -79,10 +79,6 @@ st.markdown("""
         .maturity-table th {
             background-color: #f2f2f2;
             font-weight: bold;
-        }
-        /* New class for centered subheader and caption */
-        .centered-text {
-            text-align: center;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -234,11 +230,12 @@ def calculate_scores(responses):
 
 # --- Pages ---
 if st.session_state.page == "intro":
-    # --- LOGO INTEGRATION ON INTRO PAGE removed as requested ---
+    # --- LOGO INTEGRATION ON INTRO PAGE using URL ---
+    # Removed the image from the intro page as requested.
     
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
-    st.markdown("<div class='centered-text'><h2>Your Agentic ESG Copilot</h2></div>", unsafe_allow_html=True)
-    st.markdown("<div class='centered-text'><p>Crafted by Hemaang Patkar</p></div>", unsafe_allow_html=True)
+    st.subheader("Your Agentic ESG Copilot")
+    st.caption("Crafted by Hemaang Patkar")
     
     st.info("💡 **Expected time to complete the assessment: ~10-15 minutes.**") # Estimated time
     
@@ -271,7 +268,6 @@ if st.session_state.page == "intro":
 elif st.session_state.page == "details":
     st.title("🏢 Agentic Profile Setup")
     st.caption("VerdeBot is learning your company's DNA to provide the most relevant analysis. The more detail, the smarter your copilot becomes!")
-    st.info("💡 This detailed profile allows VerdeBot to tailor its advice, enhancing the relevance and actionable nature of the generated roadmap. Comprehensive data collection at this stage is key for a truly 'agentic' experience.")
     
     with st.form("org_form"):
         info = st.session_state.company_info # Reference the session state dictionary directly
@@ -407,11 +403,11 @@ elif st.session_state.page == "details":
         if st.form_submit_button("Activate ESG Analysis →"):
             st.session_state.page = "env"
             st.rerun()
+    st.info("💡 Profiling enables VerdeBot to deliver personalized, actionable roadmaps.")
 
 elif st.session_state.page == "env":
     st.header("🌿 Environmental Evaluation")
     st.caption("VerdeBot is interpreting your sustainability posture regarding your operational impact, resource management, and climate initiatives. Your answers here will inform environmental risk and opportunity assessments.")
-    st.info("💡 Each question's consistent format simplifies data entry, and responses are immediately stored in session state, forming the knowledge base for VerdeBot's deep analysis.")
     with st.form("env_form"):
         for i, q in enumerate(env_questions):
             show_question_block(q, i, len(env_questions))
@@ -419,11 +415,11 @@ elif st.session_state.page == "env":
         if st.form_submit_button("Continue to Social 🤝"):
             st.session_state.page = "soc"
             st.rerun()
+    st.info("💡 Consistent questions streamline input and power deep analysis.")
 
 elif st.session_state.page == "soc":
     st.header("🤝 Social Assessment")
     st.caption("VerdeBot is analyzing your commitments to human capital, community engagement, and product responsibility. These insights will shape recommendations for social equity and stakeholder relations.")
-    st.info("💡 The multi-page flow ensures a structured data collection process, preventing user fatigue and maintaining data integrity for the AI model's comprehensive understanding.")
     with st.form("soc_form"):
         for i, q in enumerate(soc_questions):
             show_question_block(q, i, len(soc_questions))
@@ -431,11 +427,11 @@ elif st.session_state.page == "soc":
         if st.form_submit_button("Continue to Governance 🏛️"):
             st.session_state.page = "gov"
             st.rerun()
+    st.info("💡 Multi-page flow ensures clean, fatigue-free data collection.")
 
 elif st.session_state.page == "gov":
     st.header("🏛️ Governance Assessment")
     st.caption("VerdeBot is parsing leadership ethics, board oversight, transparency, and compliance structures. This is crucial for evaluating long-term resilience and accountability.")
-    st.info("💡 Each pillar's assessment contributes to a holistic view, enabling VerdeBot to generate balanced and comprehensive ESG strategies, demonstrating the power of structured data for AI.")
     with st.form("gov_form"):
         for i, q in enumerate(gov_questions):
             show_question_block(q, i, len(gov_questions))
@@ -443,11 +439,11 @@ elif st.session_state.page == "gov":
         if st.form_submit_button("Review My Answers 🔍"): # Button to go to review page
             st.session_state.page = "review"
             st.rerun()
+    st.info("💡 Each pillar adds to a complete, strategy-ready ESG view.")
 
 elif st.session_state.page == "review":
     st.title("🔍 Final Review: Confirm Your Inputs")
     st.caption("VerdeBot is almost ready! Please take a moment to review your provided information. Accuracy here ensures the highest quality ESG analysis.")
-    st.info("💡 This review step is crucial for data validation, allowing users to correct inputs before the AI generates its final output, enhancing trust and accuracy in the AI's recommendations.")
     st.markdown("---")
 
     st.markdown("<h3 class='section-title'>✔️ Your Self-Assessment Responses</h3>", unsafe_allow_html=True)
@@ -465,6 +461,7 @@ elif st.session_state.page == "review":
         st.session_state.page = "results"
         st.session_state.results_generated = True # Set the flag to true
         st.rerun()
+    st.info("💡 Reviewing ensures accurate input and trusted AI output.")
 
 elif st.session_state.page == "results":
     st.title("📊 VerdeIQ Agentic ESG Summary")
@@ -596,7 +593,7 @@ Thank you for your patience as VerdeBot formulates boardroom-ready recommendatio
                 detailed_answers = ""
                 for q_item in questions:
                     if q_item['id'] in responses:
-                        detailed_answers += f"- {q_item['id']}: {q_item['question']} -> {responses[q_item['id']]}\n"
+                        detailed_answers += f"- {q_item['id']}: {q_item['question']} -> {responses[q_item['id']]}\n" 
                     else:
                         detailed_answers += f"- {q_item['id']}: {q_item['question']} -> Not answered\n"
 
@@ -693,7 +690,7 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                     recs = output.get("text") or output.get("message")
                     if recs:
                         st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
-                        st.markdown(recs.replace("**->**", "->"))
+                        st.markdown(recs.replace("**->**", "->")) 
                         
                         st.download_button(
                             label="⬇️ Download Roadmap as Text",
