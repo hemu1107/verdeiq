@@ -149,7 +149,7 @@ progress_percentage = (st.session_state.current_page_index / (total_pages - 1)) 
 with st.sidebar:
     # --- LOGO INTEGRATION IN SIDEBAR using URL ---
     # Adjusted width for sidebar to fit nicely.
-    st.image(LOGO_URL, width=50) # Slightly smaller width for sidebar
+    st.image(LOGO_URL, width=135) # Slightly smaller width for sidebar
     st.markdown("---") # Separator below the logo
 
     st.markdown("## 🧭 Navigation")
