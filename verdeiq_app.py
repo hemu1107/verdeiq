@@ -80,6 +80,10 @@ st.markdown("""
             background-color: #f2f2f2;
             font-weight: bold;
         }
+        /* New class for centered subheader and caption */
+        .centered-text {
+            text-align: center;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -149,7 +153,7 @@ progress_percentage = (st.session_state.current_page_index / (total_pages - 1)) 
 with st.sidebar:
     # --- LOGO INTEGRATION IN SIDEBAR using URL ---
     # Adjusted width for sidebar to fit nicely.
-    st.image(LOGO_URL, width=140) # Slightly smaller width for sidebar
+    st.image(LOGO_URL, width=120) # Slightly smaller width for sidebar
     st.markdown("---") # Separator below the logo
 
     st.markdown("## 🧭 Navigation")
@@ -207,7 +211,7 @@ def calculate_scores(responses):
     for q in questions:
         if q["id"] in responses and responses[q["id"]] in q["options"]: # Only consider answered questions with valid options
             score = q["options"].index(responses[q["id"]]) # 0 for first option, 1 for second, etc. (assuming 0-4 scale)
-            max_option_score = len(q["options"]) - 1 
+            max_option_score = len(q["options"]) - 1
 
             weighted_score = score * weights.get(q["pillar"], 1.0) # Use .get with default 1.0 for safety
             total_weighted_score += weighted_score
@@ -230,14 +234,14 @@ def calculate_scores(responses):
 
 # --- Pages ---
 if st.session_state.page == "intro":
-    # --- LOGO INTEGRATION ON INTRO PAGE using URL ---
-    # Removed the image from the intro page as requested.
+    # --- LOGO INTEGRATION ON INTRO PAGE removed as requested ---
+    # st.image(LOGO_URL, use_container_width=True) # Removed this line
     
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
-    st.subheader("Your Agentic ESG Copilot")
-    st.caption("Crafted by Hemaang Patkar")
+    st.markdown("<div class='centered-text'><h2>Your Agentic ESG Copilot</h2></div>", unsafe_allow_html=True)
+    st.markdown("<div class='centered-text'><p>Crafted by Hemaang Patkar</p></div>", unsafe_allow_html=True)
     
-    st.info("💡 **Expected time to complete the assessment: ~10-15 minutes.**") # Estimated time
+    st.info("💡 **Expected time to complete the assessment: ~10-15 minutes.**")
     
     st.markdown("""
     **VerdeIQ** simulates the behavior of a real-world ESG consultant. It doesn't just score; it **analyzes**, **advises**, and **adapts** based on your company's unique profile.
@@ -593,7 +597,7 @@ Thank you for your patience as VerdeBot formulates boardroom-ready recommendatio
                 detailed_answers = ""
                 for q_item in questions:
                     if q_item['id'] in responses:
-                        detailed_answers += f"- {q_item['id']}: {q_item['question']} -> {responses[q_item['id']]}\n" 
+                        detailed_answers += f"- {q_item['id']}: {q_item['question']} -> {responses[q_item['id']]}\n"
                     else:
                         detailed_answers += f"- {q_item['id']}: {q_item['question']} -> Not answered\n"
 
@@ -690,7 +694,7 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                     recs = output.get("text") or output.get("message")
                     if recs:
                         st.subheader("📓 VerdeBot's Strategic ESG Roadmap")
-                        st.markdown(recs.replace("**->**", "->")) 
+                        st.markdown(recs.replace("**->**", "->"))
                         
                         st.download_button(
                             label="⬇️ Download Roadmap as Text",
