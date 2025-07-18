@@ -231,10 +231,7 @@ def calculate_scores(responses):
 # --- Pages ---
 if st.session_state.page == "intro":
     # --- LOGO INTEGRATION ON INTRO PAGE using URL ---
-    # Using use_container_width=True for better responsiveness.
-    col1, col2, col3 = st.columns([1, 2, 1]) # Columns for centering
-    with col2:
-        st.image(LOGO_URL, use_container_width=True) # Replaced use_column_width with use_container_width
+    # Removed the image from the intro page as requested.
     
     st.markdown("<div class='title-style'>Welcome to VerdeIQ!</div>", unsafe_allow_html=True)
     st.subheader("Your Agentic ESG Copilot")
