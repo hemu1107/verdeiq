@@ -684,7 +684,7 @@ Approach this with the analytical rigor of a McKinsey or BCG ESG lead, blending 
                             "Authorization": f"Bearer {cohere_api_key}",
                             "Content-Type": "application/json"
                         },
-                        json={"model": "command-r-plus", "message": prompt}
+                        json={"model": "command-r-", "message": prompt}
                     )
                     output = response.json()
                     recs = output.get("text") or output.get("message")
